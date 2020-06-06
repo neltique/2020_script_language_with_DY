@@ -6,6 +6,7 @@ from io import BytesIO
 import urllib
 import urllib.request
 from PIL import Image,ImageTk
+from tour import *
 
 WIDTH = 900
 HEIGHT = 450
@@ -18,8 +19,11 @@ class UI():
         self.window.configure(bg="skyblue")
         self.window.resizable(True,True)
         self.fontstyle = font.Font(self.window, size=8, weight='bold', family='Consolas')
-
-
+###############
+        self.T = tour()
+        self.areaCodeDict1 = self.T.makeAreaCode()
+        self.areaCodeDict2 = {}
+        ##################
         self.setupCombobox()
         self.setupButton()
         self.setupListbox()
@@ -113,17 +117,38 @@ class UI():
     def setupCombobox(self):
         self.combofont = font.Font(self.window, size=14, weight='bold', family='맑은 고딕')
 
-        self.firstCombobox = ttk.Combobox(self.window, width=15,height=5, font = self.combofont)
-        self.firstCombobox['values'] = ('first1', 'first2', 'first3', 'first4', 'first5')
+        self.firstCombobox = ttk.Combobox(self.window, width=15,height=5, font=self.combofont)
+
+        lst = []
+        for value in self.areaCodeDict1.keys():
+            lst.append(value)
+        self.firstCombobox['values'] = tuple(lst)
+
+
         self.firstCombobox.set("시/도")
         self.firstCombobox.place(x=10, y=10)
         self.firstCombobox.configure(state='readonly')
 
-        self.secondCombobox = ttk.Combobox(self.window, width=15,height=5,font = self.combofont)
-        self.secondCombobox['values'] = ('second1', 'second2', 'second3','second4','second5')
+
+        self.secondCombobox = ttk.Combobox(self.window, width=15, height=5, font=self.combofont)
+        self.secondCombobox['values'] = ('')
         self.secondCombobox.set("시/군/구")
         self.secondCombobox.place(x=220, y=10)
         self.secondCombobox.configure(state='readonly')
+        self.secondCombobox.config(state = DISABLED)
+
+        self.firstCombobox.bind("<<ComboboxSelected>>", self.firstComb_selected)
+
+    def firstComb_selected(self, *args):
+        if self.firstCombobox.current() != -1:
+            self.secondCombobox.config(state='normal')
+            self.T.setAreaCode(self.areaCodeDict1[self.firstCombobox.get()])
+            self.areaCodeDict2 = self.T.makeAreaCode()
+            lst = []
+            for value in self.areaCodeDict2.keys():
+                lst.append(value)
+            self.secondCombobox['values'] = tuple(lst)
+
 
     def search(self):
         pass
