@@ -6,7 +6,7 @@ class Card:
     def getValue(self):
         return self.value
 
-    def getsuit(self):
+    def getSuit(self):
         if self.x == 0:
             self.suit = "Clubs"
         elif self.x == 1:
@@ -18,7 +18,7 @@ class Card:
         return self.suit
 
     def filename(self):
-        return self.getsuit() + str(self.value) + ".png"
+        return self.getSuit() + str(self.value) + ".png"
 
 
 

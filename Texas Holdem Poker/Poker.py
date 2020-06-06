@@ -3,9 +3,10 @@ from tkinter import font
 from winsound import *
 from Card import *
 from Player import *
+
 import random
 
-class BlackJack:
+class Poker:
     def __init__(self):
         self.window = Tk()
         self.window.title("Texas holdem Poker 이언권 , 백도열")
@@ -13,6 +14,7 @@ class BlackJack:
         self.window.configure(bg="green")
         self.fontstyle = font.Font(self.window, size=24, weight='bold', family = 'Consolas')
         self.fontstyle2 = font.Font(self.window, size=16, weight='bold', family='Consolas')
+
         self.setupButton()
         self.setupLabel()
         self.i=0
@@ -48,16 +50,18 @@ class BlackJack:
         self.Again['bg'] = 'gray'
 
     def setupLabel(self):
-        self.LbetMoney = Label(text="$10", width=4, height=1, font=self.fontstyle, bg="green", fg="cyan")
+        self.LbetMoney = Label(text="$10", width=4, height=1, font=self.fontstyle, bg="green", fg="gold")
         self.LbetMoney.place(x=200, y=450)
-        self.LplayerMoney = Label(text="You have $990", width=15, height=1, font=self.fontstyle, bg="green", fg="cyan")
+        self.LplayerMoney = Label(text="You have $990", width=15, height=1, font=self.fontstyle, bg="green", fg="gold")
         self.LplayerMoney.place(x=500, y=450)
-        self.LplayerPts = Label(text="", width=2, height=1, font=self.fontstyle2, bg="green", fg="white")
-        self.LplayerPts.place(x=300, y=300)
-        self.LdealerPts = Label(text="", width=2, height=1, font=self.fontstyle2, bg="green", fg="white")
-        self.LdealerPts.place(x=300, y=100)
-        self.Lstatus = Label(text="", width=15, height=1, font=self.fontstyle2, bg="green", fg="white")
-        self.Lstatus.place(x=500, y=300)
+
+        self.LplayerPts = Label(text="Royal\nStraight\nFlush 13", width=11, height=3, font=self.fontstyle, bg="green", fg="cyan")
+        self.LplayerPts.place(x=300, y=325)
+        self.LdealerPts = Label(text="Royal\nStraight\nMountain 13", width=11, height=3, font=self.fontstyle, bg="green", fg="cyan")
+        self.LdealerPts.place(x=300, y=25)
+
+        self.Lstatus = Label(text="LOSE", width=4, height=1, font=self.fontstyle, bg="green", fg="red")
+        self.Lstatus.place(x=600, y=300)
 
     def pressedCheck(self):
         self.betMoney += 0
@@ -119,8 +123,6 @@ class BlackJack:
 
         self.deal()
 
-        self.player.check()
-
         self.Again['state'] = 'disabled'
         self.Again['bg'] = 'gray'
 
@@ -162,9 +164,12 @@ class BlackJack:
         if self.pressedDealcount == 0:
             self.player.reset()
             self.dealer.reset()
-            self.cardDeck = [i for i in range(52)]
+            #self.cardDeck = [i for i in range(52)]
 
-            random.shuffle(self.cardDeck)
+            # 나, 딜러, 나, 딜러
+            self.cardDeck = [1,3,5,7,1+13,2+13,3+13,4+13,5+13+13+13]
+
+            #random.shuffle(self.cardDeck)
             self.deckN = 0
 
             self.hitPlayer(0)
@@ -175,15 +180,21 @@ class BlackJack:
 
             self.nCardsPlayer = 1
             self.nCardsDealer = 0
+            self.pressedDealcount += 1
         elif self.pressedDealcount == 1:
             self.centerCard(0)
             self.centerCard(1)
             self.centerCard(2)
+            self.pressedDealcount += 1
         elif self.pressedDealcount == 2:
             self.centerCard(3)
+            self.pressedDealcount += 1
         elif self.pressedDealcount == 3:
             self.centerCard(4)
-        self.pressedDealcount += 1
+            self.pressedDealcount += 1
+        elif self.pressedDealcount == 4:
+            self.checkWinner()
+
 
 
     def centerCard(self,n):
@@ -232,6 +243,12 @@ class BlackJack:
 
         self.LdealerPts.configure(text= str(self.dealer.value()))
 
+
+        print(self.player.getRank())
+        print(self.dealer.getRank())
+
+
+
         if self.player.value() > 21:
             self.Lstatus.configure(text = "player Busts")
             PlaySound('sounds/wrong.wav', SND_FILENAME)
@@ -264,4 +281,4 @@ class BlackJack:
         self.Again['bg'] = 'white'
 
 
-BlackJack()
+Poker()
