@@ -15,20 +15,25 @@ class Poker:
         self.fontstyle = font.Font(self.window, size=24, weight='bold', family = 'Consolas')
         self.fontstyle2 = font.Font(self.window, size=16, weight='bold', family='Consolas')
 
-        self.setupButton()
-        self.setupLabel()
+        self.WinCheck = False
+        self.LoseCheck = False
+        self.PushCheck = False
         self.i=0
         self.pressedDealcount = 0
 
         self.player = Player("Player")
         self.dealer = Player("dealer")
-        self.betMoney = 10
-        self.playerMoney = 990
+
+        self.baseMoney = 10
+        self.betMoney = 0
+        self.playerMoney = 1000
         self.nCardsDealer = 0
         self.nCardsPlayer = 0
         self.LcardsPlayer = []
         self.LcardsDealer = []
         self.deckN = 0
+        self.setupButton()
+        self.setupLabel()
         self.window.mainloop()
 
 
@@ -50,9 +55,9 @@ class Poker:
         self.Again['bg'] = 'gray'
 
     def setupLabel(self):
-        self.LbetMoney = Label(text="$10", width=4, height=1, font=self.fontstyle, bg="green", fg="gold")
+        self.LbetMoney = Label(text="$"+str(self.baseMoney), width=5, height=1, font=self.fontstyle, bg="green", fg="gold")
         self.LbetMoney.place(x=200, y=450)
-        self.LplayerMoney = Label(text="You have $990", width=15, height=1, font=self.fontstyle, bg="green", fg="gold")
+        self.LplayerMoney = Label(text="You have $"+str(self.playerMoney), width=15, height=1, font=self.fontstyle, bg="green", fg="gold")
         self.LplayerMoney.place(x=500, y=450)
 
         self.LplayerPts = Label(text="", width=11, height=3, font=self.fontstyle, bg="green", fg="cyan")
@@ -64,16 +69,13 @@ class Poker:
         self.Lstatus.place(x=600, y=300)
 
     def pressedCheck(self):
-        self.betMoney += 0
-        if self.betMoney <= self.playerMoney:
-            self.LbetMoney.configure(text="$"+str(self.betMoney))
-            self.playerMoney -= 0
-            self.LplayerMoney.configure(text = "You have $"+str(self.playerMoney))
-            self.Deal["state"] = "active"
-            self.Deal["bg"] = "white"
-            PlaySound('sounds/chip.wav',SND_FILENAME)
-        else:
-            self.betMoney -= 0
+
+        self.LbetMoney.configure(text="$"+str(self.baseMoney))
+        self.LplayerMoney.configure(text = "You have $"+str(self.playerMoney))
+        self.Deal["state"] = "active"
+        self.Deal["bg"] = "white"
+        PlaySound('sounds/chip.wav',SND_FILENAME)
+
         self.Check['state'] = 'disabled'
         self.Check['bg'] = 'gray'
         self.Bx1['state'] = 'disabled'
@@ -82,17 +84,23 @@ class Poker:
         self.Bx2['bg'] = 'gray'
 
     def pressedBx1(self):
-        self.betMoney += 10*(2**self.i)
-        if self.betMoney <= self.playerMoney:
-            self.LbetMoney.configure(text="$"+str(self.betMoney))
-            self.playerMoney -= 10*(2**self.i)
-            self.LplayerMoney.configure(text = "You have $"+str(self.playerMoney))
-            self.Deal["state"] = "active"
-            self.Deal["bg"] = "white"
-            PlaySound('sounds/chip.wav',SND_FILENAME)
-
+        self.betMoney = self.baseMoney
+        if self.betMoney < self.playerMoney:
+            self.baseMoney += self.betMoney
+            self.playerMoney -= self.betMoney
         else:
-            self.betMoney -= 0
+            self.LbetMoney.configure(text="$" + str(self.baseMoney))
+            self.baseMoney += self.playerMoney
+            self.playerMoney =0
+
+        self.betMoney = 0
+        self.LbetMoney.configure(text="$" + str(self.baseMoney))
+        self.LplayerMoney.configure(text="You have $" + str(self.playerMoney))
+        self.Deal["state"] = "active"
+        self.Deal["bg"] = "white"
+        PlaySound('sounds/chip.wav', SND_FILENAME)
+
+
         self.i += 1
         self.Check['state'] = 'disabled'
         self.Check['bg'] = 'gray'
@@ -102,16 +110,22 @@ class Poker:
         self.Bx2['bg'] = 'gray'
 
     def pressedBx2(self):
-        self.betMoney += (self.betMoney*2)
-        if self.betMoney <= self.playerMoney:
-            self.LbetMoney.configure(text="$"+str(self.betMoney))
-            self.playerMoney -=  (self.betMoney*2)
-            self.LplayerMoney.configure(text = "You have $"+str(self.playerMoney))
-            self.Deal["state"] = "active"
-            self.Deal["bg"] = "white"
-            PlaySound('sounds/chip.wav',SND_FILENAME)
+        self.betMoney = self.baseMoney*2
+        if self.betMoney < self.playerMoney:
+            self.baseMoney += self.betMoney
+            self.playerMoney -= self.betMoney
         else:
-            self.betMoney -= 0
+            self.LbetMoney.configure(text="$" + str(self.baseMoney))
+            self.baseMoney += self.playerMoney
+            self.playerMoney = 0
+
+        self.betMoney = 0
+        self.LbetMoney.configure(text="$" + str(self.baseMoney))
+        self.LplayerMoney.configure(text="You have $" + str(self.playerMoney))
+        self.Deal["state"] = "active"
+        self.Deal["bg"] = "white"
+        PlaySound('sounds/chip.wav', SND_FILENAME)
+
         self.i += 1
         self.Check['state'] = 'disabled'
         self.Check['bg'] = 'gray'
@@ -127,15 +141,19 @@ class Poker:
 
         self.deal()
 
-        self.Again['state'] = 'disabled'
-        self.Again['bg'] = 'gray'
-
+        if self.playerMoney == 0 :
+            self.Bx1['state'] = 'disabled'
+            self.Bx1['bg'] = 'gray'
+            self.Bx2['state'] = 'disabled'
+            self.Bx2['bg'] = 'gray'
+        else:
+            self.Bx1['state'] = 'active'
+            self.Bx1['bg'] = 'white'
+            self.Bx2['state'] = 'active'
+            self.Bx2['bg'] = 'white'
         self.Check['state'] = 'active'
         self.Check['bg'] = 'white'
-        self.Bx1['state'] = 'active'
-        self.Bx1['bg'] = 'white'
-        self.Bx2['state'] = 'active'
-        self.Bx2['bg'] = 'white'
+
 
     def pressedAgain(self):
         self.setupButton()
@@ -153,11 +171,19 @@ class Poker:
         self.LcardsPlayer = []
         self.LcardsDealer = []
 
-        self.Lstatus = Label(text="", width=15, height=1, font=self.fontstyle2, bg="green", fg="white")
-        self.Lstatus.place(x=500, y=300)
+        self.Lstatus.configure(text = "")
 
         self.nCardsDealer = 0
         self.nCardsPlayer = 0
+
+        self.WinCheck = False
+        self.LoseCheck = False
+        self.PushCheck = False
+
+        self.baseMoney = 10
+        self.playerMoney -= self.baseMoney
+
+
 
     def deal(self):
         if self.pressedDealcount == 0:
@@ -190,6 +216,7 @@ class Poker:
             self.pressedDealcount += 1
         elif self.pressedDealcount == 4:
             self.checkWinner()
+
 
     def centerCard(self,n):
         newCard = Card(self.cardDeck[self.deckN])
@@ -231,16 +258,20 @@ class Poker:
         p = PhotoImage(file="cards/" + self.dealer.cards[0].filename())
         self.LcardsDealer[0].configure(image=p)
         self.LcardsDealer[0].image=p
+        p = PhotoImage(file="cards/" + self.dealer.cards[1].filename())
+        self.LcardsDealer[1].configure(image=p)
+        self.LcardsDealer[1].image=p
 
         self.LplayerPts.configure(text= self.player.getRank())
         self.LdealerPts.configure(text = self.dealer.getRank())
 
 
         if self.player.getPrice() < self.dealer.getPrice():
+            self.WinCheck = True
             self.Lstatus.configure(text="Win")
-            self.playerMoney += self.betMoney * 2
             PlaySound('sounds/win.wav', SND_FILENAME)
         elif self.player.getPrice()>self.dealer.getPrice():
+            self.LoseCheck = True
             self.Lstatus.configure(text="LOSE")
             PlaySound('sounds/wrong.wav', SND_FILENAME)
         else:
@@ -248,10 +279,11 @@ class Poker:
             deckD = self.player.getMyDeck()
             for i in range(7):
                 if deckP[i]>deckD[i]:
+                    self.WinCheck = True
                     self.Lstatus.configure(text="Win")
-                    self.playerMoney += self.betMoney * 2
                     PlaySound('sounds/win.wav', SND_FILENAME)
                 elif deckP[i]<deckD[i]:
+                    self.LoseCheck = True
                     self.Lstatus.configure(text="LOSE")
                     PlaySound('sounds/wrong.wav', SND_FILENAME)
                 else:
@@ -263,13 +295,22 @@ class Poker:
                     #    self.Lstatus.configure(text="LOSE")
                     #    PlaySound('sounds/wrong.wav', SND_FILENAME)
                     #else:
+                    self.PushCheck = True
                     self.Lstatus.configure(text="PUSH")
 
+        if self.WinCheck == True:
+            self.playerMoney += self.baseMoney * 2
+            self.baseMoney = 0
 
-        self.betMoney = 0
-        self.LplayerMoney.configure(text = "You have $"+str(self.playerMoney))
-        self.LbetMoney.configure(text="$"+str(self.betMoney))
+        elif self.LoseCheck == True:
+            self.baseMoney = 0
 
+        elif self.PushCheck == True:
+            self.playerMoney += self.baseMoney
+            self.baseMoney = 0
+
+        self.Check['state'] = 'disabled'
+        self.Check['bg'] = 'gray'
         self.Bx1['state'] = 'disabled'
         self.Bx1['bg'] = 'gray'
         self.Bx2['state'] = 'disabled'
@@ -278,6 +319,14 @@ class Poker:
         self.Deal['bg'] = 'gray'
         self.Again['state'] = 'active'
         self.Again['bg'] = 'white'
+
+
+        self.betMoney = 0
+        self.LplayerMoney.configure(text = "You have $"+str(self.playerMoney))
+        self.LbetMoney.configure(text="$"+str(self.betMoney))
+        print("6번 확인")
+
+
 
 
 Poker()
