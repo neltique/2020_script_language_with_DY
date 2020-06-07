@@ -7,6 +7,7 @@ import urllib
 import urllib.request
 from PIL import Image,ImageTk
 from tour import *
+from gmail import *
 
 WIDTH = 900
 HEIGHT = 450
@@ -16,9 +17,12 @@ class UI():
         self.window = Tk()
         self.window.title("ReSCH")
         self.window.geometry(str(WIDTH)+'x'+str(HEIGHT))
+        self.window.resizable(width=False , height = False)
+
         self.window.configure(bg="skyblue")
-        self.window.resizable(True,True)
         self.fontstyle = font.Font(self.window, size=8, weight='bold', family='Consolas')
+
+
 ###############
         self.T = tour()
         self.areaCodeDict1 = self.T.makeAreaCode()
@@ -99,7 +103,7 @@ class UI():
         self.mailImg = Image.open("img/mail.png")
         self.mailImg = self.mailImg.resize((60,60), Image.ANTIALIAS)
         self.resizeMailImg = ImageTk.PhotoImage(self.mailImg)
-        self.mailTab = Button(self.window, width=60, height=60, bg="white")
+        self.mailTab = Button(self.window, width=60, height=60, bg="white",command =Gmail() )
         self.mailTab["image"] = self.resizeMailImg
         self.mailTab.place(x=820, y=262)
 
@@ -119,7 +123,9 @@ class UI():
 
         self.firstCombobox = ttk.Combobox(self.window, width=15,height=5, font=self.combofont)
 
-        lst = []
+
+        # 시/도 검색
+        lst = [] #
         for value in self.areaCodeDict1.keys():
             lst.append(value)
         self.firstCombobox['values'] = tuple(lst)
