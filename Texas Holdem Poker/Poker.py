@@ -55,12 +55,12 @@ class Poker:
         self.LplayerMoney = Label(text="You have $990", width=15, height=1, font=self.fontstyle, bg="green", fg="gold")
         self.LplayerMoney.place(x=500, y=450)
 
-        self.LplayerPts = Label(text="Royal\nStraight\nFlush 13", width=11, height=3, font=self.fontstyle, bg="green", fg="cyan")
+        self.LplayerPts = Label(text="", width=11, height=3, font=self.fontstyle, bg="green", fg="cyan")
         self.LplayerPts.place(x=300, y=325)
-        self.LdealerPts = Label(text="Royal\nStraight\nMountain 13", width=11, height=3, font=self.fontstyle, bg="green", fg="cyan")
+        self.LdealerPts = Label(text="", width=11, height=3, font=self.fontstyle, bg="green", fg="cyan")
         self.LdealerPts.place(x=300, y=25)
 
-        self.Lstatus = Label(text="LOSE", width=4, height=1, font=self.fontstyle, bg="green", fg="red")
+        self.Lstatus = Label(text="", width=4, height=1, font=self.fontstyle, bg="green", fg="red")
         self.Lstatus.place(x=600, y=300)
 
     def pressedCheck(self):
@@ -74,6 +74,12 @@ class Poker:
             PlaySound('sounds/chip.wav',SND_FILENAME)
         else:
             self.betMoney -= 0
+        self.Check['state'] = 'disabled'
+        self.Check['bg'] = 'gray'
+        self.Bx1['state'] = 'disabled'
+        self.Bx1['bg'] = 'gray'
+        self.Bx2['state'] = 'disabled'
+        self.Bx2['bg'] = 'gray'
 
     def pressedBx1(self):
         self.betMoney += 10*(2**self.i)
@@ -114,8 +120,6 @@ class Poker:
         self.Bx2['state'] = 'disabled'
         self.Bx2['bg'] = 'gray'
 
-
-
     def pressedDeal(self):
         PlaySound('sounds/chip.wav', SND_FILENAME)
         self.Deal["state"] = "disabled"
@@ -132,7 +136,6 @@ class Poker:
         self.Bx1['bg'] = 'white'
         self.Bx2['state'] = 'active'
         self.Bx2['bg'] = 'white'
-
 
     def pressedAgain(self):
         self.setupButton()
@@ -156,20 +159,13 @@ class Poker:
         self.nCardsDealer = 0
         self.nCardsPlayer = 0
 
-
-
-
-
     def deal(self):
         if self.pressedDealcount == 0:
             self.player.reset()
             self.dealer.reset()
-            #self.cardDeck = [i for i in range(52)]
+            self.cardDeck = [i for i in range(52)]
 
-            # 나, 딜러, 나, 딜러
-            self.cardDeck = [1,3,5,7,1+13,2+13,3+13,4+13,5+13+13+13]
-
-            #random.shuffle(self.cardDeck)
+            random.shuffle(self.cardDeck)
             self.deckN = 0
 
             self.hitPlayer(0)
@@ -195,8 +191,6 @@ class Poker:
         elif self.pressedDealcount == 4:
             self.checkWinner()
 
-
-
     def centerCard(self,n):
         newCard = Card(self.cardDeck[self.deckN])
         self.deckN += 1
@@ -220,7 +214,6 @@ class Poker:
 
         self.LcardsPlayer[self.player.inHand() - 1].image = p
         self.LcardsPlayer[self.player.inHand() - 1].place(x=50 + n * 75, y=350)
-        self.LplayerPts.configure(text=str(self.player.value()))
         PlaySound('sounds/cardFlip1.wav', SND_FILENAME)
 
     def hitDealer(self,n):
@@ -234,38 +227,44 @@ class Poker:
         self.LcardsDealer[self.dealer.inHand() - 1].place(x=50 + n * 75, y=30)
         PlaySound('sounds/cardFlip1.wav', SND_FILENAME)
 
-
-
     def checkWinner(self):
         p = PhotoImage(file="cards/" + self.dealer.cards[0].filename())
         self.LcardsDealer[0].configure(image=p)
         self.LcardsDealer[0].image=p
 
-        self.LdealerPts.configure(text= str(self.dealer.value()))
+        self.LplayerPts.configure(text= self.player.getRank())
+        self.LdealerPts.configure(text = self.dealer.getRank())
 
 
-        print(self.player.getRank())
-        print(self.dealer.getRank())
-
-
-
-        if self.player.value() > 21:
-            self.Lstatus.configure(text = "player Busts")
-            PlaySound('sounds/wrong.wav', SND_FILENAME)
-        elif self.dealer.value() > 21:
-            self.Lstatus.configure(text = "Dealer Busts")
-            self.playerMoney += self.betMoney*2
-            PlaySound('sounds/win.wav',SND_FILENAME)
-        elif self.dealer.value() == self.player.value():
-            self.Lstatus.configure(text = "Push")
-            self.playerMoney += self.betMoney
-        elif self.dealer.value() < self.player.value():
-            self.Lstatus.configure(text = "You Won!!")
-            self.playerMoney += self.betMoney*2
+        if self.player.getPrice() < self.dealer.getPrice():
+            self.Lstatus.configure(text="Win")
+            self.playerMoney += self.betMoney * 2
             PlaySound('sounds/win.wav', SND_FILENAME)
-        else:
-            self.Lstatus.configure(text = "Sorry you lost!")
+        elif self.player.getPrice()>self.dealer.getPrice():
+            self.Lstatus.configure(text="LOSE")
             PlaySound('sounds/wrong.wav', SND_FILENAME)
+        else:
+            deckP = self.player.getMyDeck()
+            deckD = self.player.getMyDeck()
+            for i in range(7):
+                if deckP[i]>deckD[i]:
+                    self.Lstatus.configure(text="Win")
+                    self.playerMoney += self.betMoney * 2
+                    PlaySound('sounds/win.wav', SND_FILENAME)
+                elif deckP[i]<deckD[i]:
+                    self.Lstatus.configure(text="LOSE")
+                    PlaySound('sounds/wrong.wav', SND_FILENAME)
+                else:
+                    #if self.player.value()> self.dealer.value():
+                    #    self.Lstatus.configure(text="Win")
+                    #    self.playerMoney += self.betMoney * 2
+                    #    PlaySound('sounds/win.wav', SND_FILENAME)
+                    #elif self.dealer.value()>self.player.value():
+                    #    self.Lstatus.configure(text="LOSE")
+                    #    PlaySound('sounds/wrong.wav', SND_FILENAME)
+                    #else:
+                    self.Lstatus.configure(text="PUSH")
+
 
         self.betMoney = 0
         self.LplayerMoney.configure(text = "You have $"+str(self.playerMoney))
@@ -282,3 +281,4 @@ class Poker:
 
 
 Poker()
+
