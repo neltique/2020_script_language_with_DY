@@ -13,5 +13,3 @@ def Gmail():
     s.sendmail('qorehduf3@gmail.com','honey1586@naver.com',msg.as_string())
 
     s.quit()
-
-Gmail()
