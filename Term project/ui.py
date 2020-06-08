@@ -43,9 +43,6 @@ class UI():
         self.window.mainloop()
 
     def setupListbox(self):
-        #self.listCanvas = Canvas(self.window, width = 300 , height = 385 ,bg="white" )
-        #self.listCanvas.place(x=10,y=50)
-
         frame = Frame(self.window,width=320,height=385,bg="gray")
         frame.place(x=10,y=50)
 
@@ -53,14 +50,18 @@ class UI():
         scrollbar.pack(side=RIGHT,fill=Y)
 
         self.adressfont = font.Font(frame, size=11, weight='bold', family='Consolas')
-
-        self.adressList = Listbox(frame,selectmode ='extened',width=38,height = 20,font=self.adressfont,yscrollcommand = scrollbar.set)
-
+        self.adressList = Listbox(frame,selectmode ='browse',width=38,height = 20,font=self.adressfont,yscrollcommand = scrollbar.set, activestyle='none')
         scrollbar["command"] = self.adressList.yview
 
 
 
         self.adressList.pack(side=LEFT)
+        self.adressList.bind("<Double-Button-1>", self.selectList)
+
+    # 리스트에서 선택
+    def selectList(self, *args):
+        contentid = str(self.searchList[self.adressList.curselection()[0]][2])
+        print(makeDetail(contentid)["mapx"],makeDetail(contentid)["mapy"])
 
 
 # 버튼 설정
@@ -69,16 +70,6 @@ class UI():
         self.searchfont = font.Font(self.window, size=11, weight='bold', family='Consolas')
         self.searchButton = Button(text="검색", width=5, height=1, font=self.searchfont, bg="white", fg="black",command=self.search)
         self.searchButton.place(x=430, y=10)
-
-        # 취소 버튼
-
-        self.undoImg = Image.open("img/undo.png")
-        self.undoImg = self.undoImg.resize((25,25),Image.ANTIALIAS)
-        self.resizeUndoImg = ImageTk.PhotoImage(self.undoImg)
-
-        self.undoButton = Button(self.window, width=27, height=27, bg="white", command=self.undo)
-        self.undoButton["image"] = self.resizeUndoImg
-        self.undoButton.place(x=500, y=10)
 
         # 정보 버튼
         self.infoImg = Image.open("img/info.png")
@@ -160,15 +151,13 @@ class UI():
         self.areaCode = self.areaCodeDict1[self.firstCombobox.get()]
         self.B.setAreaCode(self.areaCode)
         self.B.setSigunguCode(self.sigunguCode)
-        lst = self.B.makeAreaBasedList()
+        self.searchList = self.B.makeAreaBasedList()
 
         i = 0
-        for l in lst:
+        for l in self.searchList:
             self.adressList.insert(i, l[0])
             i+=1
 
-    def undo(self):
-        pass
 
     def pressedMap(self):
         pass
