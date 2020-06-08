@@ -44,13 +44,15 @@ class UI():
     def setupListbox(self):
         #self.listCanvas = Canvas(self.window, width = 300 , height = 385 ,bg="white" )
         #self.listCanvas.place(x=10,y=50)
+        self.scrollbar = Scrollbar(self,orient ='vertical')
 
 
         self.adressfont = font.Font(self.window, size=11, weight='bold', family='Consolas')
-        self.adressList = Listbox(self.window,selectmode='extended', height=20)
+        self.adressList = Listbox(self.window,selectmode='extended', height=20,yscrollcommand=self.yscroll)
         self.adressList['width'] = 40
         self.adressList['font'] = self.adressfont
         self.adressList['activestyle']='none'
+
 
         ###########XML###########
         self.adressList.insert(0, "경기도 시흥시 정왕동 1호")
