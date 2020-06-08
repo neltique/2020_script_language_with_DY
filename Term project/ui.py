@@ -34,10 +34,6 @@ class UI():
 
         self.window.option_add('*TCombobox*Listbox.font', self.combofont)
 
-
-
-
-
         self.secondCanvas=Canvas(self.window, width = 450 , height = 380 ,bg="white" )
         self.secondCanvas.place(x=350, y=50)
 
@@ -48,6 +44,7 @@ class UI():
     def setupListbox(self):
         #self.listCanvas = Canvas(self.window, width = 300 , height = 385 ,bg="white" )
         #self.listCanvas.place(x=10,y=50)
+
 
         self.adressfont = font.Font(self.window, size=11, weight='bold', family='Consolas')
         self.adressList = Listbox(self.window,selectmode='extended', height=20)
@@ -62,6 +59,7 @@ class UI():
         self.adressList.insert(4, "경기도 시흥시 정왕동 4호")
         self.adressList.insert(5, "경기도 시흥시 정왕동 5호")
         self.adressList.insert(6, "경기도 시흥시 정왕동 6호")
+
 
         self.adressList.place(x=10,y=50)
 
@@ -140,20 +138,24 @@ class UI():
         self.secondCombobox['values'] = ('')
         self.secondCombobox.set("시/군/구")
         self.secondCombobox.place(x=220, y=10)
-        self.secondCombobox.configure(state='readonly')
-        self.secondCombobox.config(state = DISABLED)
+        self.secondCombobox.configure(state='disabled')
+
 
         self.firstCombobox.bind("<<ComboboxSelected>>", self.firstComb_selected)
 
+
     def firstComb_selected(self, *args):
         if self.firstCombobox.current() != -1:
-            self.secondCombobox.config(state='normal')
+            self.secondCombobox.configure(state='readonly')
             self.T.setAreaCode(self.areaCodeDict1[self.firstCombobox.get()])
             self.areaCodeDict2 = self.T.makeAreaCode()
             lst = []
             for value in self.areaCodeDict2.keys():
                 lst.append(value)
             self.secondCombobox['values'] = tuple(lst)
+        if self.secondCombobox.current() == -1:
+            self.secondCombobox.set("시/군/구")
+
 
 
     def search(self):
