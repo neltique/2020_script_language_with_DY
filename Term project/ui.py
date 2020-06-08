@@ -20,7 +20,7 @@ class UI():
         self.window.resizable(True,True)
         self.fontstyle = font.Font(self.window, size=8, weight='bold', family='Consolas')
 ###############
-        self.T = tour()
+        self.T = AreaCodeXML()
         self.areaCodeDict1 = self.T.makeAreaCode()
         self.areaCodeDict2 = {}
         ##################
