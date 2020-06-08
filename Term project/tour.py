@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 KEY = "%2F55799HZ4kWNygjCbwyB9fnm1HiDsnrOWQPwhswXwAU0B0EhbbV2%2FHdupErIVW0oyYaCU25Gis12h7QoZJJu3A%3D%3D"
 
 
-class tour():
+class AreaCodeXML():
     def __init__(self):
         self.conn = http.client.HTTPConnection("api.visitkorea.or.kr")
         self.url = ""

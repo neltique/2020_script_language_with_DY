@@ -24,7 +24,7 @@ class UI():
 
 
 ###############
-        self.T = tour()
+        self.T = AreaCodeXML()
         self.areaCodeDict1 = self.T.makeAreaCode()
         self.areaCodeDict2 = {}
         ##################
