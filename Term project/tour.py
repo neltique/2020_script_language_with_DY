@@ -2,11 +2,11 @@ import http.client
 import xml.etree.ElementTree as ET
 
 KEY = "%2F55799HZ4kWNygjCbwyB9fnm1HiDsnrOWQPwhswXwAU0B0EhbbV2%2FHdupErIVW0oyYaCU25Gis12h7QoZJJu3A%3D%3D"
-
+CONN = http.client.HTTPConnection("api.visitkorea.or.kr")
 
 class AreaCodeXML():
     def __init__(self):
-        self.conn = http.client.HTTPConnection("api.visitkorea.or.kr")
+        CONN = http.client.HTTPConnection("api.visitkorea.or.kr")
         self.url = ""
         self.function = "areaCode"
         self.numOfRows = "1"
@@ -40,8 +40,8 @@ class AreaCodeXML():
         self.numOfRows = str(num)
 
     def requestUrl(self):
-        self.conn.request("GET",self.url)
-        self.req = self.conn.getresponse()
+        CONN.request("GET",self.url)
+        self.req = CONN.getresponse()
 
     def updateTree(self,string):
         self.tree = ET.fromstring(self.req.read().decode('utf-8'))
@@ -77,7 +77,7 @@ class AreaCodeXML():
 
 class AreaBasedList():
     def __init__(self):
-        self.conn = http.client.HTTPConnection("api.visitkorea.or.kr")
+        CONN = http.client.HTTPConnection("api.visitkorea.or.kr")
         self.url = ""
         self.numOfRows = "1"
         self.areaCode = ""
@@ -85,7 +85,7 @@ class AreaBasedList():
 
 
     def updateUrl(self):
-        self.url = "/openapi/service/rest/KorService/areaBasedList?serviceKey="+KEY+"&pageNo=1&numOfRows="+self.numOfRows+"&MobileApp=AppTest&MobileOS=ETC&arrange=A&cat1=&contentTypeId=&areaCode="+self.areaCode+"&sigunguCode="+self.sigunguCode+"&cat2=&cat3=&listYN=Y&modifiedtime=&"
+        self.url = "/openapi/service/rest/KorService/areaBasedList?serviceKey="+KEY+"&pageNo=1&numOfRows="+self.numOfRows+"&MobileApp=tour&MobileOS=ETC&arrange=A&cat1=&contentTypeId=&areaCode="+self.areaCode+"&sigunguCode="+self.sigunguCode+"&cat2=&cat3=&listYN=Y&modifiedtime=&"
 
     def setAreaCode(self,areaCode):
         self.areaCode = areaCode
@@ -100,8 +100,8 @@ class AreaBasedList():
         return self.tree.find("body/totalCount").text
 
     def requestUrl(self):
-        self.conn.request("GET",self.url)
-        self.req = self.conn.getresponse()
+        CONN.request("GET",self.url)
+        self.req = CONN.getresponse()
 
     def updateTree(self,string):
         self.tree = ET.fromstring(self.req.read().decode('utf-8'))
@@ -134,10 +134,37 @@ class AreaBasedList():
                 contentIdList.append(item.find("contentid").text)
 
 
+
         return list(zip(titleList,addrList,contentIdList))
 
+def makeDetail(contentId):
+    url = "/openapi/service/rest/KorService/detailCommon?serviceKey="+KEY+"&numOfRows=10&pageNo=1&MobileOS=ETC&MobileApp=tour&contentId="+contentId+"&contentTypeId=&defaultYN=Y&firstImageYN=Y&areacodeYN=Y&catcodeYN=Y&addrinfoYN=Y&mapinfoYN=Y&overviewYN=Y&"
+    CONN.request("GET", url)
+    req = CONN.getresponse()
+    tree = ET.fromstring(req.read().decode('utf-8'))
+    get = tree.findall("body/items/item")
 
-
+    dic = {}
+    for item in get:
+        if item.find("addr1") != None:
+            dic["addr1"]= item.find("addr1").text
+        if item.find("firstimage") != None:
+            dic["firstimage"] = item.find("firstimage").text
+        if item.find("mapx") != None:
+            dic["mapx"] = item.find("mapx").text
+        if item.find("mapy") != None:
+            dic["mapy"] = item.find("mapy").text
+        if item.find("homepage") != None:
+            dic["homepage"] = item.find("homepage").text
+        if item.find("tel") != None:
+            dic["tel"] = item.find("tel").text
+        if item.find("zipcode") != None:
+            dic["zipcode"] = item.find("zipcode").text
+        if item.find("overview") != None:
+            dic["overview"] = item.find("overview").text
+        if item.find("title") != None:
+            dic["title"] = item.find("title").text
+    return dic
 
 
 
