@@ -159,7 +159,7 @@ class Player:
 
 
 
-        print (self.myDeck)
+
         return RankName
 
     def getMyDeck(self):

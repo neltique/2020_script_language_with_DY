@@ -290,27 +290,33 @@ class Poker:
             PlaySound('sounds/wrong.wav', SND_FILENAME)
         else:
             deckP = self.player.getMyDeck()
-            deckD = self.player.getMyDeck()
+            deckD = self.dealer.getMyDeck()
             for i in range(len(self.player.getMyDeck())):
                 if deckP[i]>deckD[i]:
                     self.WinCheck = True
                     self.Lstatus.configure(text="Win")
                     PlaySound('sounds/win.wav', SND_FILENAME)
+                    break
                 elif deckP[i]<deckD[i]:
                     self.LoseCheck = True
                     self.Lstatus.configure(text="LOSE")
                     PlaySound('sounds/wrong.wav', SND_FILENAME)
+                    break
                 else:
-                    #if self.player.value()> self.dealer.value():
-                    #    self.Lstatus.configure(text="Win")
-                    #    self.playerMoney += self.betMoney * 2
-                    #    PlaySound('sounds/win.wav', SND_FILENAME)
-                    #elif self.dealer.value()>self.player.value():
-                    #    self.Lstatus.configure(text="LOSE")
-                    #    PlaySound('sounds/wrong.wav', SND_FILENAME)
-                    #else:
-                    self.PushCheck = True
-                    self.Lstatus.configure(text="PUSH")
+                    if self.player.value()> self.dealer.value():
+                        self.WinCheck = True
+                        self.Lstatus.configure(text="Win")
+                        PlaySound('sounds/win.wav', SND_FILENAME)
+                        break
+                    elif self.dealer.value()>self.player.value():
+                        self.LoseCheck = True
+                        self.Lstatus.configure(text="LOSE")
+                        PlaySound('sounds/wrong.wav', SND_FILENAME)
+                        break
+                    else:
+                        self.PushCheck = True
+                        self.Lstatus.configure(text="PUSH")
+                        break
 
         if self.WinCheck == True:
             self.playerMoney += self.baseMoney * 2
@@ -338,7 +344,7 @@ class Poker:
         self.betMoney = 0
         self.LplayerMoney.configure(text = "You have $"+str(self.playerMoney))
         self.LbetMoney.configure(text="$"+str(self.betMoney))
-        print("6번 확인")
+
 
 
 
