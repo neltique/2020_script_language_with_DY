@@ -163,11 +163,11 @@ class UI():
 
         self.firstCombobox.bind("<<ComboboxSelected>>", self.firstComb_selected)
 
-
     def firstComb_selected(self, *args):
         if self.firstCombobox.current() != -1:
             self.secondCombobox.configure(state='readonly')
             self.T.setAreaCode(self.areaCodeDict1[self.firstCombobox.get()])
+            self.areaCode = self.T.getAreaCode()
             self.areaCodeDict2 = self.T.makeAreaCode()
             lst = []
             for value in self.areaCodeDict2.keys():
@@ -176,10 +176,14 @@ class UI():
         if self.secondCombobox.current() == -1:
             self.secondCombobox.set("시/군/구")
 
-
-
     def search(self):
-        pass
+        self.sigunguCode = self.areaCodeDict2[self.secondCombobox.get()]
+        self.areaCode = self.areaCodeDict1[self.firstCombobox.get()]
+        self.B.setAreaCode(self.areaCode)
+        self.B.setSigunguCode(self.sigunguCode)
+        lst = self.B.makeAreaBasedList()
+        for i in lst:
+            print(i[0], i[1], i[2])
 
     def undo(self):
         pass

@@ -14,6 +14,7 @@ class AreaCodeXML():
 
 
 
+
     def updateUrl(self):
         self.url = "/openapi/service/rest/KorService/" +self.function+ "?serviceKey="+ KEY +"&numOfRows="+self.numOfRows+"&pageNo=1&MobileOS=ETC&MobileApp=Tour&areaCode="+self.areaCode+"&"
 
@@ -26,8 +27,8 @@ class AreaCodeXML():
     def getAreaCode(self):
         return self.areaCode
 
-    def setAreaCode(self, num):
-        self.areaCode = num
+    def setAreaCode(self, areaCode):
+        self.areaCode = areaCode
 
     def initNumOfRows(self):
         self.numOfRows = ""
@@ -119,11 +120,21 @@ class AreaBasedList():
         titleList = []
         contentIdList = []
         for item in self.get:
-            addrList.append(item.find('addr1').text)
-            titleList.append(item.find('title').text)
-            contentIdList.append(item.find("contentid").text)
+            if item.find('addr1') == None:
+                addrList.append('')
+            else:
+                addrList.append(item.find('addr1').text)
+            if item.find('title') == None:
+                titleList.append('')
+            else:
+                titleList.append(item.find('title').text)
+            if item.find('contentid') == None:
+                contentIdList.append('')
+            else:
+                contentIdList.append(item.find("contentid").text)
 
-        dic = dict(zip(titleList,[addrList, contentIdList]))
+
+        return list(zip(titleList,addrList,contentIdList))
 
 
 
