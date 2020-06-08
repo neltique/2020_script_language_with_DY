@@ -2,6 +2,8 @@ from tkinter import *
 from tkinter import font
 from tkinter import ttk
 
+import tkinter.ttk
+
 from io import BytesIO
 import urllib
 import urllib.request
@@ -21,7 +23,6 @@ class UI():
 
         self.window.configure(bg="skyblue")
         self.fontstyle = font.Font(self.window, size=8, weight='bold', family='Consolas')
-
 
 ###############
         self.T = tour()
@@ -68,6 +69,7 @@ class UI():
 
 # 버튼 설정
     def setupButton(self):
+
         # 검색 버튼
         self.searchfont = font.Font(self.window, size=11, weight='bold', family='Consolas')
         self.searchButton = Button(text="검색", width=5, height=1, font=self.searchfont, bg="white", fg="black",command=self.search)
@@ -114,7 +116,6 @@ class UI():
         self.chatbotTab = Button(self.window, width=60, height=60, bg="white")
         self.chatbotTab["image"] = self.resizeChatbotImg
         self.chatbotTab.place(x=820, y=430-62)
-
 
 
 # 콤보박스 (시/도), (시/군/구) #########XML
