@@ -22,7 +22,6 @@ class UI():
         self.window.configure(bg="skyblue")
         self.fontstyle = font.Font(self.window, size=8, weight='bold', family='Consolas')
 
-
 ###############
         self.T = AreaCodeXML()
         self.areaCodeDict1 = self.T.makeAreaCode()
@@ -44,17 +43,37 @@ class UI():
     def setupListbox(self):
         #self.listCanvas = Canvas(self.window, width = 300 , height = 385 ,bg="white" )
         #self.listCanvas.place(x=10,y=50)
-        self.scrollbar = Scrollbar(self,orient ='vertical')
 
+        frame = Frame(self.window,width=320,height=385,bg="gray")
+        frame.place(x=10,y=50)
 
-        self.adressfont = font.Font(self.window, size=11, weight='bold', family='Consolas')
-        self.adressList = Listbox(self.window,selectmode='extended', height=20,yscrollcommand=self.yscroll)
-        self.adressList['width'] = 40
-        self.adressList['font'] = self.adressfont
-        self.adressList['activestyle']='none'
+        scrollbar= Scrollbar(frame)
+        scrollbar.pack(side=RIGHT,fill=Y)
 
+        self.adressfont = font.Font(frame, size=11, weight='bold', family='Consolas')
 
-        ###########XML###########
+        self.adressList = Listbox(frame,selectmode ='extened',width=38,height = 20,font=self.adressfont,yscrollcommand = scrollbar.set)
+
+        scrollbar["command"] = self.adressList.yview
+
+        self.adressList.insert(0, "경기도 시흥시 정왕동 1호")
+        self.adressList.insert(1, "경기도 시흥시 정왕동 2호")
+        self.adressList.insert(3, "경기도 시흥시 정왕동 3호")
+        self.adressList.insert(4, "경기도 시흥시 정왕동 4호")
+        self.adressList.insert(5, "경기도 시흥시 정왕동 5호")
+        self.adressList.insert(6, "경기도 시흥시 정왕동 6호")
+        self.adressList.insert(0, "경기도 시흥시 정왕동 1호")
+        self.adressList.insert(1, "경기도 시흥시 정왕동 2호")
+        self.adressList.insert(3, "경기도 시흥시 정왕동 3호")
+        self.adressList.insert(4, "경기도 시흥시 정왕동 4호")
+        self.adressList.insert(5, "경기도 시흥시 정왕동 5호")
+        self.adressList.insert(6, "경기도 시흥시 정왕동 6호")
+        self.adressList.insert(0, "경기도 시흥시 정왕동 1호")
+        self.adressList.insert(1, "경기도 시흥시 정왕동 2호")
+        self.adressList.insert(3, "경기도 시흥시 정왕동 3호")
+        self.adressList.insert(4, "경기도 시흥시 정왕동 4호")
+        self.adressList.insert(5, "경기도 시흥시 정왕동 5호")
+        self.adressList.insert(6, "경기도 시흥시 정왕동 6호")
         self.adressList.insert(0, "경기도 시흥시 정왕동 1호")
         self.adressList.insert(1, "경기도 시흥시 정왕동 2호")
         self.adressList.insert(3, "경기도 시흥시 정왕동 3호")
@@ -62,8 +81,7 @@ class UI():
         self.adressList.insert(5, "경기도 시흥시 정왕동 5호")
         self.adressList.insert(6, "경기도 시흥시 정왕동 6호")
 
-
-        self.adressList.place(x=10,y=50)
+        self.adressList.pack(side=LEFT)
 
 
 # 버튼 설정
