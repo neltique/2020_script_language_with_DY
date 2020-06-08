@@ -1,12 +1,24 @@
-import requests
-import json
-import http.client
+import folium
+from tkinter import *
 
-url = "https://dapi.kakao.com/v2/local/geo/coord2regioncode.xml"
-headers = {"Authorization": "KakaoAK c11cd41a6b4ce614ae81b1b07cc954eb"}
+window = Tk()
+window.title("뻑")
+window.geometry("500x500")
+window.resizable(width=False , height = False)
 
-api_test = requests.get(url,headers=headers)
-url_text = json.loads(api_test.text)
+canvas = Canvas(window)
 
 
-print(url_text)
+m = folium.Map(location=[37.564214, 127.001699],
+               tiles="OpenStreetMap",
+               zoom_start=15)
+
+canvas.create_bitmap(m)
+
+folium.Marker(location=[37.564214, 127.001699],
+              icon=folium.Icon(color='red', icon='star',
+                               popup="Center of seoul")).add_to(m)
+
+canvas.pack()
+
+window.mainloop()

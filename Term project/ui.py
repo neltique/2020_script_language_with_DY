@@ -8,6 +8,7 @@ import urllib.request
 from PIL import Image,ImageTk
 from tour import *
 from gmail import *
+from kakaoMap import *
 
 WIDTH = 900
 HEIGHT = 450
@@ -91,7 +92,7 @@ class UI():
         self.mapImg = Image.open("img/map.png")
         self.mapImg = self.mapImg.resize((60,60), Image.ANTIALIAS)
         self.resizeMapImg = ImageTk.PhotoImage(self.mapImg)
-        self.mapTab = Button(self.window, width=60, height=60, bg="white")
+        self.mapTab = Button(self.window, width=60, height=60, bg="white",command= self.pressedMap)
         self.mapTab["image"] = self.resizeMapImg
         self.mapTab.place(x=820, y=156)
 
@@ -99,7 +100,7 @@ class UI():
         self.mailImg = Image.open("img/mail.png")
         self.mailImg = self.mailImg.resize((60,60), Image.ANTIALIAS)
         self.resizeMailImg = ImageTk.PhotoImage(self.mailImg)
-        self.mailTab = Button(self.window, width=60, height=60, bg="white",command =Gmail() )
+        self.mailTab = Button(self.window, width=60, height=60, bg="white",command = Gmail() )
         self.mailTab["image"] = self.resizeMailImg
         self.mailTab.place(x=820, y=262)
 
@@ -168,6 +169,10 @@ class UI():
 
     def undo(self):
         pass
+
+    def pressedMap(self):
+        pass
+
 
 UI()
 
