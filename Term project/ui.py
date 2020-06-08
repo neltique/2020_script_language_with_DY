@@ -26,6 +26,7 @@ class UI():
         self.T = AreaCodeXML()
         self.areaCodeDict1 = self.T.makeAreaCode()
         self.areaCodeDict2 = {}
+        self.B = AreaBasedList()
         ##################
         self.setupCombobox()
         self.setupButton()
@@ -56,30 +57,7 @@ class UI():
 
         scrollbar["command"] = self.adressList.yview
 
-        self.adressList.insert(0, "경기도 시흥시 정왕동 1호")
-        self.adressList.insert(1, "경기도 시흥시 정왕동 2호")
-        self.adressList.insert(3, "경기도 시흥시 정왕동 3호")
-        self.adressList.insert(4, "경기도 시흥시 정왕동 4호")
-        self.adressList.insert(5, "경기도 시흥시 정왕동 5호")
-        self.adressList.insert(6, "경기도 시흥시 정왕동 6호")
-        self.adressList.insert(0, "경기도 시흥시 정왕동 1호")
-        self.adressList.insert(1, "경기도 시흥시 정왕동 2호")
-        self.adressList.insert(3, "경기도 시흥시 정왕동 3호")
-        self.adressList.insert(4, "경기도 시흥시 정왕동 4호")
-        self.adressList.insert(5, "경기도 시흥시 정왕동 5호")
-        self.adressList.insert(6, "경기도 시흥시 정왕동 6호")
-        self.adressList.insert(0, "경기도 시흥시 정왕동 1호")
-        self.adressList.insert(1, "경기도 시흥시 정왕동 2호")
-        self.adressList.insert(3, "경기도 시흥시 정왕동 3호")
-        self.adressList.insert(4, "경기도 시흥시 정왕동 4호")
-        self.adressList.insert(5, "경기도 시흥시 정왕동 5호")
-        self.adressList.insert(6, "경기도 시흥시 정왕동 6호")
-        self.adressList.insert(0, "경기도 시흥시 정왕동 1호")
-        self.adressList.insert(1, "경기도 시흥시 정왕동 2호")
-        self.adressList.insert(3, "경기도 시흥시 정왕동 3호")
-        self.adressList.insert(4, "경기도 시흥시 정왕동 4호")
-        self.adressList.insert(5, "경기도 시흥시 정왕동 5호")
-        self.adressList.insert(6, "경기도 시흥시 정왕동 6호")
+
 
         self.adressList.pack(side=LEFT)
 
@@ -182,8 +160,11 @@ class UI():
         self.B.setAreaCode(self.areaCode)
         self.B.setSigunguCode(self.sigunguCode)
         lst = self.B.makeAreaBasedList()
-        for i in lst:
-            print(i[0], i[1], i[2])
+
+        i = 0
+        for l in lst:
+            self.adressList.insert(i, l[0])
+            i+=1
 
     def undo(self):
         pass
