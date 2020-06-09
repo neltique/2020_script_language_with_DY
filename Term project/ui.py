@@ -99,6 +99,7 @@ class UI():
         self.Label2.grid(row=0, column=2)
         self.LabelTitle = Label(self.secondFrame, text="", bg="white")
         self.LfirstImage = Label(self.secondFrame, bg='white')
+        self.LGrayBox = Label(self.secondFrame,bg = 'gray',width = 43, height =12 )
         self.LabelAddr1Name = Label(self.secondFrame, text="", bg="white")
         self.LabelAddr1 = Label(self.secondFrame, text="", bg="white")
         self.LabelTelName = Label(self.secondFrame, text="", bg="white")
@@ -193,11 +194,15 @@ class UI():
         self.B.setAreaCode(self.areaCode)
         self.B.setSigunguCode(self.sigunguCode)
         self.searchList = self.B.makeAreaBasedList()
+        self.searchListNum = 0
 
-        i = 0
+        if self.searchListNum > 0:
+            self.adressList.delete(0, self.searchListNum -1)
+
+
         for l in self.searchList:
-            self.adressList.insert(i, l[0])
-            i += 1
+            self.adressList.insert(self.searchListNum, l[0])
+            self.searchListNum += 1
 
     def pressedMap(self):
         self.distroyInfoLabels()
@@ -218,6 +223,8 @@ class UI():
             self.infoCount += 1
 
         if 'firstimage' in self.infoDict:
+            self.LGrayBox['bg'] = 'white'
+            self.LfirstImage = Label(self.secondFrame, bg='white')
             img_url = self.infoDict['firstimage']
             response = requests.get(img_url)
             img_data = response.content
@@ -229,10 +236,8 @@ class UI():
             self.LfirstImage.grid(row=self.infoCount, column=1)
             self.infoCount += 1
         else:
-            self.LfirstImage['width'] = 43
-            self.LfirstImage['height'] = 12
-            self.LfirstImage['bg'] = 'gray'
-            self.LfirstImage.grid(row=self.infoCount, column=1)
+            self.LGrayBox = Label(self.secondFrame, bg='gray', width=44, height=13)
+            self.LGrayBox.grid(row=self.infoCount, column=1)
             self.infoCount += 1
 
         if 'addr1' in self.infoDict:
