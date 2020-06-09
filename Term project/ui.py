@@ -2,16 +2,10 @@ from tkinter import *
 from tkinter import font
 from tkinter import ttk
 from io import BytesIO
-<<<<<<< HEAD
-import urllib
-import urllib.request
 import folium
 import webbrowser
-from PIL import Image,ImageTk
-=======
-from PIL import ImageTk, Image
 
->>>>>>> a347e857add7a45c259aa0c80843e53490d6f994
+from PIL import ImageTk, Image
 from tour import *
 from gmail import *
 from kakaoMap import *
@@ -67,15 +61,15 @@ class UI():
     # 리스트에서 선택
     def selectList(self, *args):
         contentid = str(self.searchList[self.adressList.curselection()[0]][2])
-<<<<<<< HEAD
+
         #print(str(contentid))
         self.mapx = float(makeDetail(contentid)["mapx"])
         self.mapy = float(makeDetail(contentid)["mapy"])
 
-=======
+
         self.distroyInfoLabels()
         self.pressedInfo(makeDetail(contentid))
->>>>>>> a347e857add7a45c259aa0c80843e53490d6f994
+
 
 
     # 오른쪽 Frame 정보, 지도 그릴 Frame
@@ -197,8 +191,6 @@ class UI():
             i+=1
 
     def pressedMap(self):
-<<<<<<< HEAD
-
         m = folium.Map(location=[self.mapy, self.mapx],
                        tiles="OpenStreetMap", zoom_start=16)
 
@@ -208,7 +200,7 @@ class UI():
         m.save("map.html")
         webbrowser.open_new('map.html')
 
-=======
+
         self.distroyInfoLabels()
 
 
@@ -299,7 +291,7 @@ class UI():
                 str1 += str[:c] + "\n"
 
             Label(self.secondFrame, text=str1, bg="white", justify='left').grid(row=i, column=1)
->>>>>>> a347e857add7a45c259aa0c80843e53490d6f994
+
 
 
 UI()
