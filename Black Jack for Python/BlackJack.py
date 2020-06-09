@@ -54,7 +54,7 @@ class BlackJack:
         self.Again['bg'] = 'gray'
 
     def setupLabel(self):
-        self.LbetMoney = Label(text="$0", width=4, height=1, font=self.fontstyle, bg="green", fg="cyan")
+        self.LbetMo ney = Label(text="$0", width=4, height=1, font=self.fontstyle, bg="green", fg="cyan")
         self.LbetMoney.place(x=200, y=450)
         self.LplayerMoney = Label(text="you have $1000", width=15, height=1, font=self.fontstyle, bg="green", fg="cyan")
         self.LplayerMoney.place(x=500, y=450)
