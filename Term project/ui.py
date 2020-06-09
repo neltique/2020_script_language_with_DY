@@ -98,7 +98,7 @@ class UI():
         self.Label2 = Label(self.secondFrame, width=10, text="", bg="white")
         self.Label2.grid(row=0, column=2)
         self.LabelTitle = Label(self.secondFrame, text="", bg="white")
-        self.LfirstImage = Label(self.secondFrame,width = 300, height = 200, bg='white')
+        self.LfirstImage = Label(self.secondFrame, bg='white')
         self.LabelAddr1Name = Label(self.secondFrame, text="", bg="white")
         self.LabelAddr1 = Label(self.secondFrame, text="", bg="white")
         self.LabelTelName = Label(self.secondFrame, text="", bg="white")
