@@ -20,7 +20,6 @@ class UI():
         self.window.title("ReSCH")
         self.window.geometry(str(WIDTH)+'x'+str(HEIGHT))
         self.window.resizable(width=False , height = False)
-
         self.window.configure(bg="skyblue")
         self.fontstyle = font.Font(self.window, size=8, weight='bold', family='Consolas')
 
@@ -61,7 +60,7 @@ class UI():
     def selectList(self, *args):
         contentid = str(self.searchList[self.adressList.curselection()[0]][2])
         self.distroyInfoLabels()
-        self.pressedInfo(makeDetail("126508"))
+        self.pressedInfo(makeDetail(contentid))
 
 
     # 오른쪽 Frame 정보, 지도 그릴 Frame
@@ -186,18 +185,19 @@ class UI():
         self.distroyInfoLabels()
 
 
-    def pressedInfo(self, dictionary):
+    def pressedInfo(self, d):
         print("dictionary")
+        dictInfo = d
         Label(self.secondFrame, width=10, text="", bg="white").grid(row=0, column=0)
         Label(self.secondFrame, width=10, text="", bg="white").grid(row=0, column=2)
         i = 0
         LfirstImage = Label(self.secondFrame, bg='white')
-        if 'title' in dictionary:
-            Label(self.secondFrame, text=dictionary['title'], bg="white").grid(row=i, column=1)
+        if 'title' in dictInfo:
+            Label(self.secondFrame, text=dictInfo['title'], bg="white").grid(row=i, column=1)
             i += 1
 
-        if 'firstimage' in dictionary:
-            img_url = dictionary['firstimage']
+        if 'firstimage' in dictInfo:
+            img_url = dictInfo['firstimage']
             response = requests.get(img_url)
             img_data = response.content
             img = Image.open(BytesIO(img_data))
@@ -211,23 +211,23 @@ class UI():
             Label(self.secondFrame, width=43, height=12, bg='gray').grid(row=i, column=1)
             i += 1
 
-        if 'addr1' in dictionary:
+        if 'addr1' in dictInfo:
             Label(self.secondFrame, text="주소", bg="white", justify='left').grid(row=i, column=1)
             i += 2
-            Label(self.secondFrame, text=dictionary['addr1'] + "\n", bg="white", justify='left').grid(row=i, column=1)
+            Label(self.secondFrame, text=dictInfo['addr1'] + "\n", bg="white", justify='left').grid(row=i, column=1)
             i += 2
 
-        if 'tel' in dictionary:
+        if 'tel' in dictInfo:
             Label(self.secondFrame, text="전화번호", bg="white", justify='left').grid(row=i, column=1)
             i += 2
-            Label(self.secondFrame, text=dictionary['tel'] + "\n", bg="white", justify='left').grid(row=i, column=1)
+            Label(self.secondFrame, text=dictInfo['tel'] + "\n", bg="white", justify='left').grid(row=i, column=1)
             i += 2
 
-        if 'homepage' in dictionary:
+        if 'homepage' in dictInfo:
             Label(self.secondFrame, text="홈페이지", bg="white", justify='left').grid(row=i, column=1)
             i += 2
 
-            str1 = dictionary['homepage']
+            str1 = dictInfo['homepage']
             str1 = str1.replace('\n', '')
             str = ""
             a = str1.find("<a")
@@ -248,19 +248,18 @@ class UI():
             Label(self.secondFrame, text=str, bg="white", justify='left').grid(row=i, column=1)
             i += 2
 
-        if 'zipcode' in dictionary:
-            Label(self.secondFrame, text="우편번호 - " + dictionary['zipcode'] + "\n", bg="white", justify='left').grid(row=i, column=1)
+        if 'zipcode' in dictInfo:
+            Label(self.secondFrame, text="우편번호 - " + dictInfo['zipcode'] + "\n", bg="white", justify='left').grid(row=i, column=1)
             i += 2
 
-        if 'overview' in dictionary:
+        if 'overview' in dictInfo:
             Label(self.secondFrame, text="상세정보", bg="white", justify='left').grid(row=i, column=1)
             i += 2
 
-            str = dictionary['overview']
+            str = dictInfo['overview']
 
             a = str.find('*')
             str = str[a:]
-            print(str)
             str = str.replace('<br>', '<br />')
 
             str1 = ""

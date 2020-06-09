@@ -8,7 +8,7 @@ class AreaCodeXML():
     def __init__(self):
         self.url = ""
         self.function = "areaCode"
-        self.numOfRows = "1"
+        self.numOfRows = "100"
         self.areaCode = ""
 
     def updateUrl(self):
@@ -44,10 +44,6 @@ class AreaCodeXML():
         self.get = self.tree.findall(string)
 
     def makeAreaCode(self):    # 시/도 만들기 위해
-        self.updateUrl()        # 첫 url 주소 받기
-        self.requestUrl()       # 요청
-        self.updateTree("body/items/item") #첫 tree만들기 - totalCount를 얻기 위해
-        self.updateNumOfRows()  # toalCount로 numOfRows 변경
         self.updateUrl()        # 변경된 numOfRows 적용
         self.requestUrl()       # 변경된 numOfRows를 적용한 url 요청
         self.updateTree("body/items/item")  # 변경된 numOfRows를 적용한 url tree 만들기
@@ -62,10 +58,6 @@ class AreaCodeXML():
         return dic
 
     def makeAreaCode2(self):
-        self.updateUrl()  # 첫 url 주소 받기
-        self.requestUrl()  # 요청
-        self.updateTree("body/items/item")  # 첫 tree만들기 - totalCount를 얻기 위해
-        self.updateNumOfRows()  # toalCount로 numOfRows 변경
         self.updateUrl()  # 변경된 numOfRows 적용
         self.requestUrl()  # 변경된 numOfRows를 적용한 url 요청
         self.updateTree("body/items/item")  # 변경된 numOfRows를 적용한 url tree 만들기
