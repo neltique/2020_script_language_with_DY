@@ -25,7 +25,7 @@ class UI():
         self.fontstyle = font.Font(self.window, size=8, weight='bold', family='Consolas')
 
         self.infoCount = 0
-
+        self.searchListNum = 0
         ###############
         self.T = AreaCodeXML()
         self.areaCodeDict1 = self.T.makeAreaCode()
@@ -194,10 +194,11 @@ class UI():
         self.B.setAreaCode(self.areaCode)
         self.B.setSigunguCode(self.sigunguCode)
         self.searchList = self.B.makeAreaBasedList()
-        self.searchListNum = 0
+
 
         if self.searchListNum > 0:
             self.adressList.delete(0, self.searchListNum -1)
+            self.adressList.pack(side=LEFT)
 
 
         for l in self.searchList:
