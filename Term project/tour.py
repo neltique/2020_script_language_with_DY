@@ -1,19 +1,15 @@
 import http.client
 import xml.etree.ElementTree as ET
 
-KEY = "%2F55799HZ4kWNygjCbwyB9fnm1HiDsnrOWQPwhswXwAU0B0EhbbV2%2FHdupErIVW0oyYaCU25Gis12h7QoZJJu3A%3D%3D"
+KEY = "SpWe9UpmMXVZh8MHhnRCpSeVMBO88OXs%2F%2FHIVBSWA3GLBFMhbV9i0WbynUMZ6G66WEUgerpPxoXEVU5DYrQRTg%3D%3D"
 CONN = http.client.HTTPConnection("api.visitkorea.or.kr")
 
 class AreaCodeXML():
     def __init__(self):
-        CONN = http.client.HTTPConnection("api.visitkorea.or.kr")
         self.url = ""
         self.function = "areaCode"
         self.numOfRows = "1"
         self.areaCode = ""
-
-
-
 
     def updateUrl(self):
         self.url = "/openapi/service/rest/KorService/" +self.function+ "?serviceKey="+ KEY +"&numOfRows="+self.numOfRows+"&pageNo=1&MobileOS=ETC&MobileApp=Tour&areaCode="+self.areaCode+"&"
@@ -47,7 +43,6 @@ class AreaCodeXML():
         self.tree = ET.fromstring(self.req.read().decode('utf-8'))
         self.get = self.tree.findall(string)
 
-
     def makeAreaCode(self):    # 시/도 만들기 위해
         self.updateUrl()        # 첫 url 주소 받기
         self.requestUrl()       # 요청
@@ -77,7 +72,6 @@ class AreaCodeXML():
 
 class AreaBasedList():
     def __init__(self):
-        CONN = http.client.HTTPConnection("api.visitkorea.or.kr")
         self.url = ""
         self.numOfRows = "1"
         self.areaCode = ""
@@ -164,7 +158,5 @@ def makeDetail(contentId):
             dic["overview"] = item.find("overview").text
         if item.find("title") != None:
             dic["title"] = item.find("title").text
+
     return dic
-
-
-
