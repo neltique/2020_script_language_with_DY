@@ -2,8 +2,21 @@ from tkinter import *
 from tkinter import font
 from tkinter import ttk
 from io import BytesIO
+<<<<<<< Updated upstream
 from PIL import ImageTk, Image
 
+=======
+
+import urllib
+import urllib.request
+import folium
+import webbrowser
+from PIL import Image,ImageTk
+
+from PIL import ImageTk, Image
+
+
+>>>>>>> Stashed changes
 from tour import *
 from gmail import *
 from kakaoMap import *
@@ -58,12 +71,24 @@ class UI():
     # 리스트에서 선택
     def selectList(self, *args):
         contentid = str(self.searchList[self.adressList.curselection()[0]][2])
+<<<<<<< Updated upstream
         self.distroyInfoLabels()
+=======
+
+>>>>>>> Stashed changes
         #print(str(contentid))
         self.mapx = float(makeDetail(contentid)["mapx"])
         self.mapy = float(makeDetail(contentid)["mapy"])
 
+<<<<<<< Updated upstream
         self.pressedInfo(makeDetail(contentid))
+=======
+
+        self.distroyInfoLabels()
+        self.pressedInfo(makeDetail(contentid))
+
+
+>>>>>>> Stashed changes
 
     # 오른쪽 Frame 정보, 지도 그릴 Frame
     def setupInfoMapFrame(self):
@@ -179,7 +204,10 @@ class UI():
             i += 1
 
     def pressedMap(self):
+<<<<<<< Updated upstream
         self.distroyInfoLabels()
+=======
+>>>>>>> Stashed changes
 
         m = folium.Map(location=[self.mapy, self.mapx],
                        tiles="OpenStreetMap", zoom_start=16)
@@ -188,8 +216,14 @@ class UI():
                       icon=folium.Icon(color='red', icon='star', popup="ㅈ같다")).add_to(m)
 
         m.save("map.html")
-        webbrowser.open_new('map.html')
+        webbrowser.open('map.html')
 
+<<<<<<< Updated upstream
+=======
+        self.distroyInfoLabels()
+
+
+>>>>>>> Stashed changes
     def pressedInfo(self, d):
         print("dictionary")
         dictInfo = d
@@ -278,6 +312,9 @@ class UI():
                 str1 += str[:c] + "\n"
 
             Label(self.secondFrame, text=str1, bg="white", justify='left').grid(row=i, column=1)
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 
 UI()
