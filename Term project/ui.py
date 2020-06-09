@@ -24,6 +24,8 @@ class UI():
         self.window.configure(bg="skyblue")
         self.fontstyle = font.Font(self.window, size=8, weight='bold', family='Consolas')
 
+        self.infoCount = 0
+
         ###############
         self.T = AreaCodeXML()
         self.areaCodeDict1 = self.T.makeAreaCode()
@@ -34,6 +36,7 @@ class UI():
         self.setupButton()
         self.setupListbox()
         self.setupInfoMapFrame()
+        self.setupLabels()
 
         ########################################################################################################################
         self.window.option_add('*TCombobox*Listbox.font', self.combofont)
@@ -57,13 +60,14 @@ class UI():
 
     # 리스트에서 선택
     def selectList(self, *args):
+        self.infoCount = 0
         contentid = str(self.searchList[self.adressList.curselection()[0]][2])
-        self.distroyInfoLabels()
-        #print(str(contentid))
-        self.mapx = float(makeDetail(contentid)["mapx"])
-        self.mapy = float(makeDetail(contentid)["mapy"])
+        #self.distroyInfoLabels()
+        self.infoDict = makeDetail(contentid)
+        self.mapx = float(self.infoDict["mapx"])
+        self.mapy = float(self.infoDict["mapy"])
 
-        self.pressedInfo(makeDetail(contentid))
+        self.pressedInfo()
 
     # 오른쪽 Frame 정보, 지도 그릴 Frame
     def setupInfoMapFrame(self):
@@ -86,8 +90,25 @@ class UI():
         self.secondCanvas.configure(scrollregion=self.secondCanvas.bbox("all"), width=450, height=380, bg="white")
 
     def distroyInfoLabels(self):
-        for x in self.secondCanvas.find_all():
-            self.secondCanvas.delete(x)
+        pass
+
+    def setupLabels(self):
+        self.Label1 = Label(self.secondFrame, width=10, text="", bg="white")
+        self.Label1.grid(row=0, column=0)
+        self.Label2 = Label(self.secondFrame, width=10, text="", bg="white")
+        self.Label2.grid(row=0, column=2)
+        self.LabelTitle = Label(self.secondFrame, text="", bg="white")
+        self.LfirstImage = Label(self.secondFrame,width = 300, height = 200, bg='white')
+        self.LabelAddr1Name = Label(self.secondFrame, text="", bg="white")
+        self.LabelAddr1 = Label(self.secondFrame, text="", bg="white")
+        self.LabelTelName = Label(self.secondFrame, text="", bg="white")
+        self.LabelTel = Label(self.secondFrame, text="", bg="white")
+        self.LabelHomepageName = Label(self.secondFrame, text="", bg="white")
+        self.LabelHomepage = Label(self.secondFrame, text="", bg="white", justify='left')
+        self.LabelZipcodeName = Label(self.secondFrame, text="", bg="white")
+        self.LabelZipcode = Label(self.secondFrame, text="", bg="white")
+        self.LabelOverviewName = Label(self.secondFrame, text="", bg="white")
+        self.LabelOverview = Label(self.secondFrame, text="", bg="white")
 
     # 버튼 설정
     def setupButton(self):
@@ -190,94 +211,104 @@ class UI():
         m.save("map.html")
         webbrowser.open_new('map.html')
 
-    def pressedInfo(self, d):
-        print("dictionary")
-        dictInfo = d
-        Label(self.secondFrame, width=10, text="", bg="white").grid(row=0, column=0)
-        Label(self.secondFrame, width=10, text="", bg="white").grid(row=0, column=2)
-        i = 0
-        LfirstImage = Label(self.secondFrame, bg='white')
-        if 'title' in dictInfo:
-            Label(self.secondFrame, text=dictInfo['title'], bg="white").grid(row=i, column=1)
-            i += 1
+    def pressedInfo(self):
+        if 'title' in self.infoDict:
+            self.LabelTitle['text'] = self.infoDict['title']
+            self.LabelTitle.grid(row=self.infoCount, column=1)
+            self.infoCount += 1
 
-        if 'firstimage' in dictInfo:
-            img_url = dictInfo['firstimage']
+        if 'firstimage' in self.infoDict:
+            img_url = self.infoDict['firstimage']
             response = requests.get(img_url)
             img_data = response.content
             img = Image.open(BytesIO(img_data))
             img = img.resize((300, 200), Image.ANTIALIAS)
             resizeImg = ImageTk.PhotoImage(img)
-            LfirstImage['image'] = resizeImg
-            LfirstImage.image = resizeImg
-            LfirstImage.grid(row=i, column=1)
-            i += 1
+            self.LfirstImage['image'] = resizeImg
+            self.LfirstImage.image = resizeImg
+            self.LfirstImage.grid(row=self.infoCount, column=1)
+            self.infoCount += 1
         else:
-            Label(self.secondFrame, width=43, height=12, bg='gray').grid(row=i, column=1)
-            i += 1
+            self.LfirstImage['width'] = 43
+            self.LfirstImage['height'] = 12
+            self.LfirstImage['bg'] = 'gray'
+            self.LfirstImage.grid(row=self.infoCount, column=1)
+            self.infoCount += 1
 
-        if 'addr1' in dictInfo:
-            Label(self.secondFrame, text="주소", bg="white", justify='left').grid(row=i, column=1)
-            i += 2
-            Label(self.secondFrame, text=dictInfo['addr1'] + "\n", bg="white", justify='left').grid(row=i, column=1)
-            i += 2
+        if 'addr1' in self.infoDict:
+            self.LabelAddr1Name['text'] = "주소"
+            self.LabelAddr1Name.grid(row=self.infoCount, column=1)
+            self.infoCount += 2
+            self.LabelAddr1['text'] = self.infoDict['addr1']+ "\n"
+            self.LabelAddr1.grid(row=self.infoCount, column=1)
+            self.infoCount += 2
 
-        if 'tel' in dictInfo:
-            Label(self.secondFrame, text="전화번호", bg="white", justify='left').grid(row=i, column=1)
-            i += 2
-            Label(self.secondFrame, text=dictInfo['tel'] + "\n", bg="white", justify='left').grid(row=i, column=1)
-            i += 2
+        if 'tel' in self.infoDict:
+            self.LabelTelName['text'] = "전화번호"
+            self.LabelTelName.grid(row=self.infoCount, column=1)
+            self.infoCount += 2
+            self.LabelTel['text'] = self.infoDict['tel'] + "\n"
+            self.LabelTel.grid(row=self.infoCount, column=1)
+            self.infoCount += 2
 
-        if 'homepage' in dictInfo:
-            Label(self.secondFrame, text="홈페이지", bg="white", justify='left').grid(row=i, column=1)
-            i += 2
+        # if 'homepage' in self.infoDict:
+        #     self.LabelHomepageName['text'] = "홈페이지"
+        #     self.LabelHomepageName.grid(row=self.infoCount, column=1)
+        #     self.infoCount += 2
+        #
+        #     str1 = self.infoDict['homepage']
+        #     str1 = str1.replace('\n', '')
+        #     str = ""
+        #     a = str1.find("<a")
+        #     b = str1.find("a>")
+        #     c = str1.find('href="')
+        #     d = str1.find('" target')
+        #     tempstr1 = str1[:a - 1]
+        #     tempstr2 = str1[c + 6:d]
+        #     str += tempstr1 + " - " + tempstr2 + "\n"
+        #     for j in range(str1.count('<a') - 1):
+        #         a = str1[a + 1:].find("<a") + a + 1
+        #         tempstr1 = str1[b + 8:a - 1]
+        #         b = str1[b + 8:].find("a>") + b + 8
+        #         c = str1[c + 6:].find('href="') + c + 6
+        #         d = str1[d + 8:].find('" target=') + d + 8
+        #         tempstr2 = str1[c + 6:d]
+        #         str += tempstr1 + " - " + tempstr2 + "\n"
+        #
+        #     self.LabelHomepage['text'] = str
+        #     self.LabelHomepage.grid(row=self.infoCount, column=1)
+        #     self.infoCount += 2
 
-            str1 = dictInfo['homepage']
-            str1 = str1.replace('\n', '')
-            str = ""
-            a = str1.find("<a")
-            b = str1.find("a>")
-            c = str1.find('href="')
-            d = str1.find('" target')
-            tempstr1 = str1[:a - 1]
-            tempstr2 = str1[c + 6:d]
-            str += tempstr1 + " - " + tempstr2 + "\n"
-            for j in range(str1.count('<a') - 1):
-                a = str1[a + 1:].find("<a") + a + 1
-                tempstr1 = str1[b + 8:a - 1]
-                b = str1[b + 8:].find("a>") + b + 8
-                c = str1[c + 6:].find('href="') + c + 6
-                d = str1[d + 8:].find('" target=') + d + 8
-                tempstr2 = str1[c + 6:d]
-                str += tempstr1 + " - " + tempstr2 + "\n"
-            Label(self.secondFrame, text=str, bg="white", justify='left').grid(row=i, column=1)
-            i += 2
+        if 'zipcode' in self.infoDict:
+            self.LabelZipcodeName['text'] = "우편번호"
+            self.LabelZipcodeName.grid(row=self.infoCount, column=1)
+            self.infoCount+=2
+            self.LabelZipcode['text'] = self.infoDict['zipcode'] + "\n"
+            self.LabelZipcode.grid(row=self.infoCount,column=1)
+            self.infoCount += 2
 
-        if 'zipcode' in dictInfo:
-            Label(self.secondFrame, text="우편번호 - " + dictInfo['zipcode'] + "\n", bg="white", justify='left').grid(row=i,
-                                                                                                                  column=1)
-            i += 2
-
-        if 'overview' in dictInfo:
-            Label(self.secondFrame, text="상세정보", bg="white", justify='left').grid(row=i, column=1)
-            i += 2
-
-            str = dictInfo['overview']
-
-            a = str.find('*')
-            str = str[a:]
-            str = str.replace('<br>', '<br />')
-
-            str1 = ""
-            c = str.find('<br />')
-            str1 += str[:c] + "\n"
-
-            for j in range(str.count('<br />') - 1):
-                str = str.replace(str[:c] + '<br />', '')
-                c = str.find('<br />')
-                str1 += str[:c] + "\n"
-
-            Label(self.secondFrame, text=str1, bg="white", justify='left').grid(row=i, column=1)
-
+        # if 'overview' in self.infoDict:
+        #
+        #     self.LabelOverviewName['text'] = "상세정보"
+        #     self.LabelOverviewName.grid(row = self.infoCount, column = 1)
+        #
+        #     self.infoCount += 2
+        #
+        #     str = self.infoDict['overview']
+        #
+        #     a = str.find('*')
+        #     str = str[a:]
+        #     str = str.replace('<br>', '<br />')
+        #
+        #     str1 = ""
+        #     c = str.find('<br />')
+        #     str1 += str[:c] + "\n"
+        #
+        #     for j in range(str.count('<br />') - 1):
+        #         str = str.replace(str[:c] + '<br />', '')
+        #         c = str.find('<br />')
+        #         str1 += str[:c] + "\n"
+        #     self.LabelOverview['text'] = str1
+        #     self.LabelOverview.grid(row=self.infoCount, column=1)
 
 UI()
