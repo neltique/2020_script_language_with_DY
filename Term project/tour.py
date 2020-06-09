@@ -1,7 +1,7 @@
 import http.client
 import xml.etree.ElementTree as ET
 
-KEY = "%2F55799HZ4kWNygjCbwyB9fnm1HiDsnrOWQPwhswXwAU0B0EhbbV2%2FHdupErIVW0oyYaCU25Gis12h7QoZJJu3A%3D%3D"
+KEY = "SpWe9UpmMXVZh8MHhnRCpSeVMBO88OXs%2F%2FHIVBSWA3GLBFMhbV9i0WbynUMZ6G66WEUgerpPxoXEVU5DYrQRTg%3D%3D"
 CONN = http.client.HTTPConnection("api.visitkorea.or.kr")
 
 class AreaCodeXML():

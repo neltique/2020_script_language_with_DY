@@ -23,7 +23,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_ab71f9ec94fd488d8813516e87e3d7a2 {
+                #map_c84ff8e4a17344c983c25307299fc74b {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -35,17 +35,17 @@
 </head>
 <body>    
     
-            <div class="folium-map" id="map_ab71f9ec94fd488d8813516e87e3d7a2" ></div>
+            <div class="folium-map" id="map_c84ff8e4a17344c983c25307299fc74b" ></div>
         
 </body>
 <script>    
     
-            var map_ab71f9ec94fd488d8813516e87e3d7a2 = L.map(
-                "map_ab71f9ec94fd488d8813516e87e3d7a2",
+            var map_c84ff8e4a17344c983c25307299fc74b = L.map(
+                "map_c84ff8e4a17344c983c25307299fc74b",
                 {
-                    center: [35.128700037, 126.9701895569],
+                    center: [37.3402849, 126.7313189],
                     crs: L.CRS.EPSG3857,
-                    zoom: 15,
+                    zoom: 13,
                     zoomControl: true,
                     preferCanvas: false,
                 }
@@ -55,21 +55,28 @@
 
         
     
-            var tile_layer_d608258c18a44054a067c14f39f12e70 = L.tileLayer(
+            var tile_layer_04d190d5db754776afd2b8f063394d58 = L.tileLayer(
                 "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                 {"attribution": "Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
-            ).addTo(map_ab71f9ec94fd488d8813516e87e3d7a2);
+            ).addTo(map_c84ff8e4a17344c983c25307299fc74b);
         
     
-            var marker_de89c32d8f5a4d039e5454ddf8a45c95 = L.marker(
-                [35.128700037, 126.9701895569],
+            var marker_9c10802c596f445eb3750c80e9aceafb = L.marker(
+                [37.3402849, 126.7313189],
                 {}
-            ).addTo(map_ab71f9ec94fd488d8813516e87e3d7a2);
+            ).addTo(map_c84ff8e4a17344c983c25307299fc74b);
         
     
-            var icon_b9a4b40996ea4e08bc517e560c241756 = L.AwesomeMarkers.icon(
-                {"extraClasses": "fa-rotate-0", "icon": "star", "iconColor": "white", "markerColor": "red", "popup": "\u3148\uac19\ub2e4", "prefix": "glyphicon"}
-            );
-            marker_de89c32d8f5a4d039e5454ddf8a45c95.setIcon(icon_b9a4b40996ea4e08bc517e560c241756);
+        var popup_690a92742ffe4ab99e96c721ab434f58 = L.popup({"maxWidth": "100%"});
+
         
+            var html_eb694c51f7ad4c51a2d75501d594956a = $(`<div id="html_eb694c51f7ad4c51a2d75501d594956a" style="width: 100.0%; height: 100.0%;">한국산업기술대</div>`)[0];
+            popup_690a92742ffe4ab99e96c721ab434f58.setContent(html_eb694c51f7ad4c51a2d75501d594956a);
+        
+
+        marker_9c10802c596f445eb3750c80e9aceafb.bindPopup(popup_690a92742ffe4ab99e96c721ab434f58)
+        ;
+
+        
+    
 </script>

@@ -5,6 +5,8 @@ from tkinter import ttk
 from io import BytesIO
 import urllib
 import urllib.request
+import folium
+import webbrowser
 from PIL import Image,ImageTk
 from tour import *
 from gmail import *
@@ -61,7 +63,10 @@ class UI():
     # 리스트에서 선택
     def selectList(self, *args):
         contentid = str(self.searchList[self.adressList.curselection()[0]][2])
-        print(makeDetail(contentid)["mapx"],makeDetail(contentid)["mapy"])
+        #print(str(contentid))
+        self.mapx = float(makeDetail(contentid)["mapx"])
+        self.mapy = float(makeDetail(contentid)["mapy"])
+
 
 
 # 버튼 설정
@@ -83,7 +88,7 @@ class UI():
         self.mapImg = Image.open("img/map.png")
         self.mapImg = self.mapImg.resize((60,60), Image.ANTIALIAS)
         self.resizeMapImg = ImageTk.PhotoImage(self.mapImg)
-        self.mapTab = Button(self.window, width=60, height=60, bg="white",command= self.pressedMap)
+        self.mapTab = Button(self.window, width=60, height=60, bg="white",command = self.pressedMap)
         self.mapTab["image"] = self.resizeMapImg
         self.mapTab.place(x=820, y=156)
 
@@ -160,7 +165,16 @@ class UI():
 
 
     def pressedMap(self):
-        pass
+
+        m = folium.Map(location=[self.mapy, self.mapx],
+                       tiles="OpenStreetMap", zoom_start=16)
+
+        folium.Marker(location=[self.mapy, self.mapx],
+                      icon=folium.Icon(color='red', icon='star', popup="ㅈ같다")).add_to(m)
+
+        m.save("map.html")
+        webbrowser.open_new('map.html')
+
 
 
 UI()
