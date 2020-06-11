@@ -5,65 +5,6 @@ KEY = "SpWe9UpmMXVZh8MHhnRCpSeVMBO88OXs%2F%2FHIVBSWA3GLBFMhbV9i0WbynUMZ6G66WEUge
 CONN = http.client.HTTPConnection("api.visitkorea.or.kr")
 
 
-class AreaCodeXML():
-    def __init__(self):
-        self.url = ""
-        self.function = "areaCode"
-        self.numOfRows = "100"
-        self.areaCode = ""
-
-    def updateUrl(self):
-        self.url = "/openapi/service/rest/KorService/" + self.function + "?serviceKey=" + KEY + "&numOfRows=" + self.numOfRows + "&pageNo=1&MobileOS=ETC&MobileApp=Tour&areaCode=" + self.areaCode + "&"
-
-    def updateNumOfRows(self):
-        self.numOfRows = self.getNumOfRows()
-
-    def initAreaCode(self):
-        self.areaCode = ""
-
-    def getAreaCode(self):
-        return self.areaCode
-
-    def setAreaCode(self, areaCode):
-        self.areaCode = areaCode
-
-    def initNumOfRows(self):
-        self.numOfRows = ""
-
-    def getNumOfRows(self):
-        return self.tree.find("body/totalCount").text
-
-    def setNumOfRows(self, num):
-        self.numOfRows = str(num)
-
-    def requestUrl(self):
-        CONN.request("GET", self.url)
-        self.req = CONN.getresponse()
-
-    def updateTree(self, string):
-        self.tree = ET.fromstring(self.req.read().decode('utf-8'))
-        self.get = self.tree.findall(string)
-
-    def makeAreaCode(self):  # 시/도 만들기 위해
-        self.updateUrl()  # 변경된 numOfRows 적용
-        self.requestUrl()  # 변경된 numOfRows를 적용한 url 요청
-        self.updateTree("body/items/item")  # 변경된 numOfRows를 적용한 url tree 만들기
-
-        lst1 = []
-        lst2 = []
-        for item in self.get:
-            lst1.append(item.find('name').text)
-            lst2.append(item.find('code').text)
-        dic = dict(zip(lst1, lst2))
-
-        return dic
-
-    def makeAreaCode2(self):
-        self.updateUrl()  # 변경된 numOfRows 적용
-        self.requestUrl()  # 변경된 numOfRows를 적용한 url 요청
-        self.updateTree("body/items/item")  # 변경된 numOfRows를 적용한 url tree 만들기
-
-
 class AreaBasedList():
     def __init__(self):
         self.url = ""
