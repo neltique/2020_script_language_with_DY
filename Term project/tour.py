@@ -91,5 +91,4 @@ def makeDetail(contentId):
             dic["overview"] = item.find("overview").text
         if item.find("title") != None:
             dic["title"] = item.find("title").text
-
     return dic

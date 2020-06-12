@@ -2,7 +2,7 @@ import urllib.request
 
 import http.client
 import xml.etree.ElementTree as ET
-import urllib.request
+
 
 def mapDownLoad(mapx, mapy):
      server = 'dapi.kakao.com'

@@ -1,17 +1,21 @@
 from tkinter import *
+from tkinterhtml import *
 from tkinter import font
-from tkinter import ttk
-from io import BytesIO
+
+from urllib.request import urlopen
 from PIL import ImageTk, Image
+
 from tour import *
 from gmail import *
+
+import io
 import kakaoMap
 import json
+import dictToHTML
 
 with open('AreaCodes.json', 'r', encoding='UTF-8-sig') as f:
      AreaCodeData = json.load(f)
 
-import requests
 
 WIDTH = 900
 HEIGHT = 450
@@ -20,7 +24,7 @@ HEIGHT = 450
 def gantihal(frame):
     frame.tkraise()
 
-class UI():
+class TourSearchGUI():
     def __init__(self):
         self.window = Tk()
         self.window.title("ReSCH")
@@ -42,7 +46,6 @@ class UI():
 
 
         self.setupInfoMapFrame()
-        self.setupInfoLabels()
 
         ########################################################################################################################
         self.window.option_add('*TCombobox*Listbox.font', self.combofont)
@@ -73,9 +76,6 @@ class UI():
         self.mapLevel = 5
         self.makeMapFrame()
 
-
-
-
     # 맵 다운로드, 정보 가져오는 함수
     def makeInfoDetailDict(self):
         # 선택된 리스트의 contentid 값을 가져와 dictionary에 저장, x좌표와 y 좌표를 저장
@@ -91,39 +91,15 @@ class UI():
         self.MapCanvas = Canvas(self.MapFrame, width=450, height=380, bg="white", bd=0, highlightthickness=0)
         self.MapCanvas.pack()
 
-        self.InfoFrame = Frame(self.window, relief=GROOVE, width=100, height=10, bg="white", bd=0, highlightthickness=0)
+        self.InfoFrame = Frame(self.window, relief=GROOVE, width=450, height=380, bg="white", bd=0, highlightthickness=0)
         self.InfoFrame.place(x=350, y=50)
-        self.InfoCanvas = Canvas(self.InfoFrame, width=433, height=380, bg="white", bd=0, highlightthickness=0)
-        self.InfoCanvasFrame = Frame(self.InfoCanvas, bg="white", bd=0, highlightthickness=0)
-        myscrollbar = Scrollbar(self.InfoFrame, orient="vertical", command=self.InfoCanvas.yview, bd=0,
-                                highlightthickness=0)
-        self.InfoCanvas.configure(yscrollcommand=myscrollbar.set)
-        myscrollbar.pack(side="right", fill="y")
-        self.InfoCanvas.create_window((0, 0), window=self.InfoCanvasFrame, anchor='nw')
-        self.InfoCanvas.pack(side="left")
-
-    def afterCanvasScroll(self, event):
-        self.InfoCanvas.configure(scrollregion=self.InfoCanvas.bbox("all"), width=433, height=380, bg="white")
+        self.InfoFrame.propagate(0)
+        self.InfoCanvasFrame = HtmlFrame(self.InfoFrame, fontscale=1, horizontal_scrollbar=False, vertical_scrollbar=False)
+        self.InfoCanvasFrame.pack()
 
 
-    def setupInfoLabels(self):
-        self.Label1 = Label(self.InfoCanvasFrame, width=10, text="", bg="white")
-        self.Label1.grid(row=0, column=0)
-        self.Label2 = Label(self.InfoCanvasFrame, width=10, text="", bg="white")
-        self.Label2.grid(row=0, column=2)
-        self.LabelTitle = Label(self.InfoCanvasFrame, text="", bg="white")
-        self.LfirstImage = Label(self.InfoCanvasFrame, bg='white')
-        self.LGrayBox = Label(self.InfoCanvasFrame, bg ='gray', width = 43, height =12)
-        self.LabelAddr1Name = Label(self.InfoCanvasFrame, text="", bg="white")
-        self.LabelAddr1 = Label(self.InfoCanvasFrame, text="", bg="white")
-        self.LabelTelName = Label(self.InfoCanvasFrame, text="", bg="white")
-        self.LabelTel = Label(self.InfoCanvasFrame, text="", bg="white")
-        self.LabelHomepageName = Label(self.InfoCanvasFrame, text="", bg="white")
-        self.LabelHomepage = Label(self.InfoCanvasFrame, text="", bg="white", justify='left')
-        self.LabelZipcodeName = Label(self.InfoCanvasFrame, text="", bg="white")
-        self.LabelZipcode = Label(self.InfoCanvasFrame, text="", bg="white")
-        self.LabelOverviewName = Label(self.InfoCanvasFrame, text="", bg="white")
-        self.LabelOverview = Label(self.InfoCanvasFrame, text="", bg="white")
+
+
 
 
     # 버튼 설정
@@ -222,110 +198,33 @@ class UI():
 
     # 수정해야함
     def makeInfoFrame(self):
-        # 오른쪽 프레임에 정보 표시
+        images = {}
 
-        if 'title' in self.infoDict:
-            self.LabelTitle['text'] = self.infoDict['title']
-            self.LabelTitle.grid(row=self.infoCount, column=1)
-            self.infoCount += 1
+        def renderimage(url):
+            fp = urlopen(url)
+            data = fp.read()
+            fp.close()
+            image = Image.open(io.BytesIO(data))
+            photo = ImageTk.PhotoImage(image)
+            images[url] = photo
+            return photo
 
-        if 'firstimage' in self.infoDict:
-            self.LGrayBox['bg'] = 'white'
-            self.LfirstImage = Label(self.InfoCanvasFrame, bg='white')
-            img_url = self.infoDict['firstimage']
-            response = requests.get(img_url)
-            img_data = response.content
-            img = Image.open(BytesIO(img_data))
-            img = img.resize((300, 200), Image.ANTIALIAS)
-            resizeImg = ImageTk.PhotoImage(img)
-            self.LfirstImage['image'] = resizeImg
-            self.LfirstImage.image = resizeImg
-            self.LfirstImage.grid(row=self.infoCount, column=1)
-            self.infoCount += 1
-        else:
-            self.LGrayBox = Label(self.InfoCanvasFrame, bg='gray', width=44, height=13)
-            self.LGrayBox.grid(row=self.infoCount, column=1)
-            self.infoCount += 1
+        self.InfoCanvas = TkinterHtml(self.InfoCanvasFrame, fontscale=0.8, imagecmd=renderimage)
+        self.InfoCanvas.grid(row=0, column=0, sticky=tk.NSEW)
 
-        if 'addr1' in self.infoDict:
-            self.LabelAddr1Name['text'] = "주소"
-            self.LabelAddr1Name.grid(row=self.infoCount, column=1)
-            self.infoCount += 2
-            self.LabelAddr1['text'] = self.infoDict['addr1'] + "\n"
-            self.LabelAddr1.grid(row=self.infoCount, column=1)
-            self.infoCount += 2
+        vsb = ttk.Scrollbar(self.InfoCanvasFrame, orient=tk.VERTICAL, command=self.InfoCanvas.yview)
+        self.InfoCanvas.configure(yscrollcommand=vsb.set)
+        vsb.grid(row=0, column=1, sticky=tk.NSEW)
 
-        if 'tel' in self.infoDict:
-            self.LabelTelName['text'] = "전화번호"
-            self.LabelTelName.grid(row=self.infoCount, column=1)
-            self.infoCount += 2
-            self.LabelTel['text'] = self.infoDict['tel'] + "\n"
-            self.LabelTel.grid(row=self.infoCount, column=1)
-            self.infoCount += 2
+        self.InfoCanvas.reset()
+        self.InfoCanvas.parse(dictToHTML.dictToHTML(self.infoDict))
 
-        # if 'homepage' in self.infoDict:
-        #     self.LabelHomepageName['text'] = "홈페이지"
-        #     self.LabelHomepageName.grid(row=self.infoCount, column=1)
-        #     self.infoCount += 2
-        #
-        #     str1 = self.infoDict['homepage']
-        #     str1 = str1.replace('\n', '')
-        #     str = ""
-        #     a = str1.find("<a")
-        #     b = str1.find("a>")
-        #     c = str1.find('href="')
-        #     d = str1.find('" target')
-        #     tempstr1 = str1[:a - 1]
-        #     tempstr2 = str1[c + 6:d]
-        #     str += tempstr1 + " - " + tempstr2 + "\n"
-        #     for j in range(str1.count('<a') - 1):
-        #         a = str1[a + 1:].find("<a") + a + 1
-        #         tempstr1 = str1[b + 8:a - 1]
-        #         b = str1[b + 8:].find("a>") + b + 8
-        #         c = str1[c + 6:].find('href="') + c + 6
-        #         d = str1[d + 8:].find('" target=') + d + 8
-        #         tempstr2 = str1[c + 6:d]
-        #         str += tempstr1 + " - " + tempstr2 + "\n"
-        #
-        #     self.LabelHomepage['text'] = str
-        #     self.LabelHomepage.grid(row=self.infoCount, column=1)
-        #     self.infoCount += 2
 
-        if 'zipcode' in self.infoDict:
-            self.LabelZipcodeName['text'] = "우편번호"
-            self.LabelZipcodeName.grid(row=self.infoCount, column=1)
-            self.infoCount += 2
-            self.LabelZipcode['text'] = self.infoDict['zipcode'] + "\n"
-            self.LabelZipcode.grid(row=self.infoCount, column=1)
-            self.infoCount += 2
 
-        # if 'overview' in self.infoDict:
-        #
-        #     self.LabelOverviewName['text'] = "상세정보"
-        #     self.LabelOverviewName.grid(row = self.infoCount, column = 1)
-        #
-        #     self.infoCount += 2
-        #
-        #     str = self.infoDict['overview']
-        #
-        #     a = str.find('*')
-        #     str = str[a:]
-        #     str = str.replace('<br>', '<br />')
-        #
-        #     str1 = ""
-        #     c = str.find('<br />')
-        #     str1 += str[:c] + "\n"
-        #
-        #     for j in range(str.count('<br />') - 1):
-        #         str = str.replace(str[:c] + '<br />', '')
-        #         c = str.find('<br />')
-        #         str1 += str[:c] + "\n"
-        #     self.LabelOverview['text'] = str1
-        #     self.LabelOverview.grid(row=self.infoCount, column=1)
+
 
     # 지도 완성, 지도 이미지 다운 받는 부분 속도가 느림
     def makeMapFrame(self):
-
         mapImage = PhotoImage(file="maps/map" + str(self.mapLevel) + ".jpg")
         self.MapCanvas.create_image(0,0,anchor='nw', image=mapImage)
         self.MapCanvas.image = mapImage
@@ -371,9 +270,4 @@ class UI():
         else:
             self.zoomOutMap()
 
-
-
-
-
-
-UI()
+TourSearchGUI()
