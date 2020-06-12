@@ -5,8 +5,9 @@ from io import BytesIO
 from PIL import ImageTk, Image
 from tour import *
 from gmail import *
-# from kakaoMap import *
+import kakaoMap
 import json
+
 with open('AreaCodes.json', 'r', encoding='UTF-8-sig') as f:
      AreaCodeData = json.load(f)
 
@@ -15,6 +16,9 @@ import requests
 WIDTH = 900
 HEIGHT = 450
 
+
+def gantihal(frame):
+    frame.tkraise()
 
 class UI():
     def __init__(self):
@@ -26,9 +30,7 @@ class UI():
         self.fontstyle = font.Font(self.window, size=8, weight='bold', family='Consolas')
 
         self.infoCount = 0
-        self.searchListNum = 0
-        self.isViewInfoCanvas = True
-        self.listClick = False
+        self.mapLevel = 5
 
         ###############
         self.areaCodeDict = AreaCodeData        # json파일로 지역 dict를 받아온다
@@ -40,7 +42,7 @@ class UI():
 
 
         self.setupInfoMapFrame()
-        self.setupLabels()
+        self.setupInfoLabels()
 
         ########################################################################################################################
         self.window.option_add('*TCombobox*Listbox.font', self.combofont)
@@ -48,7 +50,7 @@ class UI():
 
     # 왼쪽 Frame 리스트 박스 준비
     def setupListbox(self):
-        firstFrame = Frame(self.window, width=320, height=385, bg="gray")
+        firstFrame = Frame(self.window, width=320, height=385, bg="gray",bd = 0, highlightthickness = 0)
         firstFrame.place(x=10, y=50)
 
         scrollbar = Scrollbar(firstFrame)
@@ -56,76 +58,73 @@ class UI():
 
         self.adressfont = font.Font(firstFrame, size=11, weight='bold', family='Consolas')
         self.adressList = Listbox(firstFrame, selectmode='browse', width=38, height=20, font=self.adressfont,
-                                  yscrollcommand=scrollbar.set, activestyle='none')
+                                  yscrollcommand=scrollbar.set, activestyle='none',bd = 0, highlightthickness = 0)
         scrollbar["command"] = self.adressList.yview
         self.adressList.pack(side=LEFT)
 
         self.adressList.bind("<Double-Button-1>", self.selectListDouble)
-        self.adressList.bind("<<ListboxSelect>>", self.selectListA)
-
-    # 리스트 한 번 클릭
-    def selectListA(self, *args):
-        self.selectedNow = self.adressList.get(self.adressList.curselection()[0])
-        self.listClick = True
 
     # 리스트 더블 클릭
     def selectListDouble(self, *args):
         self.infoCount = 0
+        self.makeInfoDetailDict()
+        self.makeInfoFrame()
+        kakaoMap.mapDownLoad(self.mapx,self.mapy)
+        self.mapLevel = 5
+        self.makeMapFrame()
+
+
+
+
+    # 맵 다운로드, 정보 가져오는 함수
+    def makeInfoDetailDict(self):
+        # 선택된 리스트의 contentid 값을 가져와 dictionary에 저장, x좌표와 y 좌표를 저장
         contentid = str(self.searchList[self.adressList.curselection()[0]][2])
         self.infoDict = makeDetail(contentid)
-        self.mapx = float(self.infoDict["mapx"])
-        self.mapy = float(self.infoDict["mapy"])
-        self.listClick = False
-
-        # 현재 오른쪽 프레임이 정보를 보여주고 있을 때
-        if self.isViewInfoCanvas == True:
-           self.pressedInfo()
-        # 현재 오른쪽 프레임이 지도를 보여주고 있을 때
-        else:
-            self.pressedMap()
+        self.mapx = self.infoDict["mapx"]
+        self.mapy = self.infoDict["mapy"]
 
     # 오른쪽 Frame 정보, 지도 그릴 Frame
     def setupInfoMapFrame(self):
-        secondFrame = Frame(self.window, relief=GROOVE, width=10, height=10, bg="white")
-        secondFrame.place(x=350, y=50)
+        self.MapFrame = Frame(self.window, relief=GROOVE, width=100, height=10, bg="white", bd=0, highlightthickness=0)
+        self.MapFrame.place(x=350, y=50)
+        self.MapCanvas = Canvas(self.MapFrame, width=450, height=380, bg="white", bd=0, highlightthickness=0)
+        self.MapCanvas.pack()
 
-        self.secondCanvas = Canvas(secondFrame, width=450, height=380, bg="white")
-        self.secondFrame = Frame(self.secondCanvas, bg="white")
-        myscrollbar = Scrollbar(secondFrame, orient="vertical", command=self.secondCanvas.yview)
-        self.secondCanvas.configure(yscrollcommand=myscrollbar.set)
-
+        self.InfoFrame = Frame(self.window, relief=GROOVE, width=100, height=10, bg="white", bd=0, highlightthickness=0)
+        self.InfoFrame.place(x=350, y=50)
+        self.InfoCanvas = Canvas(self.InfoFrame, width=433, height=380, bg="white", bd=0, highlightthickness=0)
+        self.InfoCanvasFrame = Frame(self.InfoCanvas, bg="white", bd=0, highlightthickness=0)
+        myscrollbar = Scrollbar(self.InfoFrame, orient="vertical", command=self.InfoCanvas.yview, bd=0,
+                                highlightthickness=0)
+        self.InfoCanvas.configure(yscrollcommand=myscrollbar.set)
         myscrollbar.pack(side="right", fill="y")
-
-        self.secondCanvas.create_window((0, 0), window=self.secondFrame, anchor='nw')
-        self.secondCanvas.pack(side="left")
-        self.secondCanvas.create_window((0, 0), window=self.secondFrame, anchor='nw')
-        self.secondFrame.bind("<Configure>", self.afterCanvasScroll)
-
+        self.InfoCanvas.create_window((0, 0), window=self.InfoCanvasFrame, anchor='nw')
+        self.InfoCanvas.pack(side="left")
 
     def afterCanvasScroll(self, event):
-        self.secondCanvas.configure(scrollregion=self.secondCanvas.bbox("all"), width=450, height=380, bg="white")
+        self.InfoCanvas.configure(scrollregion=self.InfoCanvas.bbox("all"), width=433, height=380, bg="white")
 
-    def distroyInfoLabels(self):
-        pass
 
-    def setupLabels(self):
-        self.Label1 = Label(self.secondFrame, width=10, text="", bg="white")
+    def setupInfoLabels(self):
+        self.Label1 = Label(self.InfoCanvasFrame, width=10, text="", bg="white")
         self.Label1.grid(row=0, column=0)
-        self.Label2 = Label(self.secondFrame, width=10, text="", bg="white")
+        self.Label2 = Label(self.InfoCanvasFrame, width=10, text="", bg="white")
         self.Label2.grid(row=0, column=2)
-        self.LabelTitle = Label(self.secondFrame, text="", bg="white")
-        self.LfirstImage = Label(self.secondFrame, bg='white')
-        self.LGrayBox = Label(self.secondFrame,bg = 'gray',width = 43, height =12 )
-        self.LabelAddr1Name = Label(self.secondFrame, text="", bg="white")
-        self.LabelAddr1 = Label(self.secondFrame, text="", bg="white")
-        self.LabelTelName = Label(self.secondFrame, text="", bg="white")
-        self.LabelTel = Label(self.secondFrame, text="", bg="white")
-        self.LabelHomepageName = Label(self.secondFrame, text="", bg="white")
-        self.LabelHomepage = Label(self.secondFrame, text="", bg="white", justify='left')
-        self.LabelZipcodeName = Label(self.secondFrame, text="", bg="white")
-        self.LabelZipcode = Label(self.secondFrame, text="", bg="white")
-        self.LabelOverviewName = Label(self.secondFrame, text="", bg="white")
-        self.LabelOverview = Label(self.secondFrame, text="", bg="white")
+        self.LabelTitle = Label(self.InfoCanvasFrame, text="", bg="white")
+        self.LfirstImage = Label(self.InfoCanvasFrame, bg='white')
+        self.LGrayBox = Label(self.InfoCanvasFrame, bg ='gray', width = 43, height =12)
+        self.LabelAddr1Name = Label(self.InfoCanvasFrame, text="", bg="white")
+        self.LabelAddr1 = Label(self.InfoCanvasFrame, text="", bg="white")
+        self.LabelTelName = Label(self.InfoCanvasFrame, text="", bg="white")
+        self.LabelTel = Label(self.InfoCanvasFrame, text="", bg="white")
+        self.LabelHomepageName = Label(self.InfoCanvasFrame, text="", bg="white")
+        self.LabelHomepage = Label(self.InfoCanvasFrame, text="", bg="white", justify='left')
+        self.LabelZipcodeName = Label(self.InfoCanvasFrame, text="", bg="white")
+        self.LabelZipcode = Label(self.InfoCanvasFrame, text="", bg="white")
+        self.LabelOverviewName = Label(self.InfoCanvasFrame, text="", bg="white")
+        self.LabelOverview = Label(self.InfoCanvasFrame, text="", bg="white")
+
 
     # 버튼 설정
     def setupButton(self):
@@ -139,33 +138,33 @@ class UI():
         self.infoImg = Image.open("img/info.png")
         self.infoImg = self.infoImg.resize((60, 60), Image.ANTIALIAS)
         self.resizeInfoImg = ImageTk.PhotoImage(self.infoImg)
-        self.infoTab = Button(self.window, width=60, height=60, bg="white", command=self.pressedInfo)
+        self.infoTab = Button(self.window, width=60, height=60, bg="white",bd = 0,highlightthickness = 0, command=lambda:gantihal(self.InfoFrame))
         self.infoTab["image"] = self.resizeInfoImg
-        self.infoTab.place(x=820, y=50)
+        self.infoTab.place(x=830, y=50)
 
         # 지도 버튼
         self.mapImg = Image.open("img/map.png")
         self.mapImg = self.mapImg.resize((60, 60), Image.ANTIALIAS)
         self.resizeMapImg = ImageTk.PhotoImage(self.mapImg)
-        self.mapTab = Button(self.window, width=60, height=60, bg="white", command=self.pressedMap)
+        self.mapTab = Button(self.window, width=60, height=60, bg="white",bd = 0,highlightthickness = 0, command=lambda:gantihal(self.MapFrame))
         self.mapTab["image"] = self.resizeMapImg
-        self.mapTab.place(x=820, y=156)
+        self.mapTab.place(x=830, y=156)
 
         # 메일 보내기 버튼
         self.mailImg = Image.open("img/mail.png")
         self.mailImg = self.mailImg.resize((60, 60), Image.ANTIALIAS)
         self.resizeMailImg = ImageTk.PhotoImage(self.mailImg)
-        self.mailTab = Button(self.window, width=60, height=60, bg="white", command=Gmail())
+        self.mailTab = Button(self.window, width=60, height=60, bg="white",bd = 0,highlightthickness = 0, command=Gmail())
         self.mailTab["image"] = self.resizeMailImg
-        self.mailTab.place(x=820, y=262)
+        self.mailTab.place(x=830, y=262)
 
         # 챗봇 버튼튼
         self.chatbotImg = Image.open("img/chatbot.png")
         self.chatbotImg = self.chatbotImg.resize((60, 60), Image.ANTIALIAS)
         self.resizeChatbotImg = ImageTk.PhotoImage(self.chatbotImg)
-        self.chatbotTab = Button(self.window, width=60, height=60, bg="white")
+        self.chatbotTab = Button(self.window, width=60, height=60,bd = 0,highlightthickness = 0, bg="white")
         self.chatbotTab["image"] = self.resizeChatbotImg
-        self.chatbotTab.place(x=820, y=430 - 62)
+        self.chatbotTab.place(x=830, y=430 - 62)
 
     # 콤보박스 (시/도), (시/군/구)
     def setupCombobox(self):
@@ -219,142 +218,161 @@ class UI():
             for l in self.searchList:
                 self.adressList.insert(END, l[0])
         else:
-            print("search error")
+            print("You did not select area")
 
-
-    def pressedMap(self):
-        # 정보가 아니라 지도를 위해 False로 설정
-        self.isViewInfoCanvas = False
-        # 리스트 중 하나를 선택해서 정보 버튼을 누를 때
-        if self.listClick == True:
-            contentid = str(self.searchList[self.adressList.curselection()[0]][2])
-            self.infoDict = makeDetail(contentid)
-            self.mapx = float(self.infoDict["mapx"])
-            self.mapy = float(self.infoDict["mapy"])
-            self.viewSecondFrame()
-        # 현재 지도 나타나 있을 때 더블 클릭 후
-        else:
-            self.viewSecondFrame()
-
-    def pressedInfo(self):
-        # 정보를 나타내기 위해 True로 설정
-        self.isViewInfoCanvas = True
-        # 리스트 중 하나를 선택해서 정보 버튼을 누를 때
-        if self.listClick == True:
-            self.infoCount = 0
-            contentid = str(self.searchList[self.adressList.curselection()[0]][2])
-            self.infoDict = makeDetail(contentid)
-            self.viewSecondFrame()
-        # 현재 정보가 나타나 있을 때 더블 클릭 후
-        else:
-            self.infoCount = 0
-            self.viewSecondFrame()
-
-    def viewSecondFrame(self):
+    # 수정해야함
+    def makeInfoFrame(self):
         # 오른쪽 프레임에 정보 표시
-        if self.isViewInfoCanvas == True:
-            if 'title' in self.infoDict:
-                self.LabelTitle['text'] = self.infoDict['title']
-                self.LabelTitle.grid(row=self.infoCount, column=1)
-                self.infoCount += 1
 
-            if 'firstimage' in self.infoDict:
-                self.LGrayBox['bg'] = 'white'
-                self.LfirstImage = Label(self.secondFrame, bg='white')
-                img_url = self.infoDict['firstimage']
-                response = requests.get(img_url)
-                img_data = response.content
-                img = Image.open(BytesIO(img_data))
-                img = img.resize((300, 200), Image.ANTIALIAS)
-                resizeImg = ImageTk.PhotoImage(img)
-                self.LfirstImage['image'] = resizeImg
-                self.LfirstImage.image = resizeImg
-                self.LfirstImage.grid(row=self.infoCount, column=1)
-                self.infoCount += 1
-            else:
-                self.LGrayBox = Label(self.secondFrame, bg='gray', width=44, height=13)
-                self.LGrayBox.grid(row=self.infoCount, column=1)
-                self.infoCount += 1
+        if 'title' in self.infoDict:
+            self.LabelTitle['text'] = self.infoDict['title']
+            self.LabelTitle.grid(row=self.infoCount, column=1)
+            self.infoCount += 1
 
-            if 'addr1' in self.infoDict:
-                self.LabelAddr1Name['text'] = "주소"
-                self.LabelAddr1Name.grid(row=self.infoCount, column=1)
-                self.infoCount += 2
-                self.LabelAddr1['text'] = self.infoDict['addr1'] + "\n"
-                self.LabelAddr1.grid(row=self.infoCount, column=1)
-                self.infoCount += 2
-
-            if 'tel' in self.infoDict:
-                self.LabelTelName['text'] = "전화번호"
-                self.LabelTelName.grid(row=self.infoCount, column=1)
-                self.infoCount += 2
-                self.LabelTel['text'] = self.infoDict['tel'] + "\n"
-                self.LabelTel.grid(row=self.infoCount, column=1)
-                self.infoCount += 2
-
-            # if 'homepage' in self.infoDict:
-            #     self.LabelHomepageName['text'] = "홈페이지"
-            #     self.LabelHomepageName.grid(row=self.infoCount, column=1)
-            #     self.infoCount += 2
-            #
-            #     str1 = self.infoDict['homepage']
-            #     str1 = str1.replace('\n', '')
-            #     str = ""
-            #     a = str1.find("<a")
-            #     b = str1.find("a>")
-            #     c = str1.find('href="')
-            #     d = str1.find('" target')
-            #     tempstr1 = str1[:a - 1]
-            #     tempstr2 = str1[c + 6:d]
-            #     str += tempstr1 + " - " + tempstr2 + "\n"
-            #     for j in range(str1.count('<a') - 1):
-            #         a = str1[a + 1:].find("<a") + a + 1
-            #         tempstr1 = str1[b + 8:a - 1]
-            #         b = str1[b + 8:].find("a>") + b + 8
-            #         c = str1[c + 6:].find('href="') + c + 6
-            #         d = str1[d + 8:].find('" target=') + d + 8
-            #         tempstr2 = str1[c + 6:d]
-            #         str += tempstr1 + " - " + tempstr2 + "\n"
-            #
-            #     self.LabelHomepage['text'] = str
-            #     self.LabelHomepage.grid(row=self.infoCount, column=1)
-            #     self.infoCount += 2
-
-            if 'zipcode' in self.infoDict:
-                self.LabelZipcodeName['text'] = "우편번호"
-                self.LabelZipcodeName.grid(row=self.infoCount, column=1)
-                self.infoCount += 2
-                self.LabelZipcode['text'] = self.infoDict['zipcode'] + "\n"
-                self.LabelZipcode.grid(row=self.infoCount, column=1)
-                self.infoCount += 2
-
-            # if 'overview' in self.infoDict:
-            #
-            #     self.LabelOverviewName['text'] = "상세정보"
-            #     self.LabelOverviewName.grid(row = self.infoCount, column = 1)
-            #
-            #     self.infoCount += 2
-            #
-            #     str = self.infoDict['overview']
-            #
-            #     a = str.find('*')
-            #     str = str[a:]
-            #     str = str.replace('<br>', '<br />')
-            #
-            #     str1 = ""
-            #     c = str.find('<br />')
-            #     str1 += str[:c] + "\n"
-            #
-            #     for j in range(str.count('<br />') - 1):
-            #         str = str.replace(str[:c] + '<br />', '')
-            #         c = str.find('<br />')
-            #         str1 += str[:c] + "\n"
-            #     self.LabelOverview['text'] = str1
-            #     self.LabelOverview.grid(row=self.infoCount, column=1)
-
+        if 'firstimage' in self.infoDict:
+            self.LGrayBox['bg'] = 'white'
+            self.LfirstImage = Label(self.InfoCanvasFrame, bg='white')
+            img_url = self.infoDict['firstimage']
+            response = requests.get(img_url)
+            img_data = response.content
+            img = Image.open(BytesIO(img_data))
+            img = img.resize((300, 200), Image.ANTIALIAS)
+            resizeImg = ImageTk.PhotoImage(img)
+            self.LfirstImage['image'] = resizeImg
+            self.LfirstImage.image = resizeImg
+            self.LfirstImage.grid(row=self.infoCount, column=1)
+            self.infoCount += 1
         else:
-            # 오른쪽 프레임에 지도 표시
-            pass
+            self.LGrayBox = Label(self.InfoCanvasFrame, bg='gray', width=44, height=13)
+            self.LGrayBox.grid(row=self.infoCount, column=1)
+            self.infoCount += 1
+
+        if 'addr1' in self.infoDict:
+            self.LabelAddr1Name['text'] = "주소"
+            self.LabelAddr1Name.grid(row=self.infoCount, column=1)
+            self.infoCount += 2
+            self.LabelAddr1['text'] = self.infoDict['addr1'] + "\n"
+            self.LabelAddr1.grid(row=self.infoCount, column=1)
+            self.infoCount += 2
+
+        if 'tel' in self.infoDict:
+            self.LabelTelName['text'] = "전화번호"
+            self.LabelTelName.grid(row=self.infoCount, column=1)
+            self.infoCount += 2
+            self.LabelTel['text'] = self.infoDict['tel'] + "\n"
+            self.LabelTel.grid(row=self.infoCount, column=1)
+            self.infoCount += 2
+
+        # if 'homepage' in self.infoDict:
+        #     self.LabelHomepageName['text'] = "홈페이지"
+        #     self.LabelHomepageName.grid(row=self.infoCount, column=1)
+        #     self.infoCount += 2
+        #
+        #     str1 = self.infoDict['homepage']
+        #     str1 = str1.replace('\n', '')
+        #     str = ""
+        #     a = str1.find("<a")
+        #     b = str1.find("a>")
+        #     c = str1.find('href="')
+        #     d = str1.find('" target')
+        #     tempstr1 = str1[:a - 1]
+        #     tempstr2 = str1[c + 6:d]
+        #     str += tempstr1 + " - " + tempstr2 + "\n"
+        #     for j in range(str1.count('<a') - 1):
+        #         a = str1[a + 1:].find("<a") + a + 1
+        #         tempstr1 = str1[b + 8:a - 1]
+        #         b = str1[b + 8:].find("a>") + b + 8
+        #         c = str1[c + 6:].find('href="') + c + 6
+        #         d = str1[d + 8:].find('" target=') + d + 8
+        #         tempstr2 = str1[c + 6:d]
+        #         str += tempstr1 + " - " + tempstr2 + "\n"
+        #
+        #     self.LabelHomepage['text'] = str
+        #     self.LabelHomepage.grid(row=self.infoCount, column=1)
+        #     self.infoCount += 2
+
+        if 'zipcode' in self.infoDict:
+            self.LabelZipcodeName['text'] = "우편번호"
+            self.LabelZipcodeName.grid(row=self.infoCount, column=1)
+            self.infoCount += 2
+            self.LabelZipcode['text'] = self.infoDict['zipcode'] + "\n"
+            self.LabelZipcode.grid(row=self.infoCount, column=1)
+            self.infoCount += 2
+
+        # if 'overview' in self.infoDict:
+        #
+        #     self.LabelOverviewName['text'] = "상세정보"
+        #     self.LabelOverviewName.grid(row = self.infoCount, column = 1)
+        #
+        #     self.infoCount += 2
+        #
+        #     str = self.infoDict['overview']
+        #
+        #     a = str.find('*')
+        #     str = str[a:]
+        #     str = str.replace('<br>', '<br />')
+        #
+        #     str1 = ""
+        #     c = str.find('<br />')
+        #     str1 += str[:c] + "\n"
+        #
+        #     for j in range(str.count('<br />') - 1):
+        #         str = str.replace(str[:c] + '<br />', '')
+        #         c = str.find('<br />')
+        #         str1 += str[:c] + "\n"
+        #     self.LabelOverview['text'] = str1
+        #     self.LabelOverview.grid(row=self.infoCount, column=1)
+
+    # 지도 완성, 지도 이미지 다운 받는 부분 속도가 느림
+    def makeMapFrame(self):
+
+        mapImage = PhotoImage(file="maps/map" + str(self.mapLevel) + ".jpg")
+        self.MapCanvas.create_image(0,0,anchor='nw', image=mapImage)
+        self.MapCanvas.image = mapImage
+        self.MapCanvas.bind("<MouseWheel>", self.MouseWheelHandlerInMap)
+
+        zoomInCanvas = Canvas(self.MapFrame, width=30, height=30, bg='gray', bd=1, highlightthickness=0)
+        zoomIn = ImageTk.PhotoImage(Image.open("img/zoomin.jpg"))  # PIL solution
+        zoomInCanvas.create_image(0, 0, anchor='nw', image=zoomIn)
+        zoomInCanvas.image = zoomIn
+        zoomInCanvas.place(x=450 - 32, y=380 - 64)
+        zoomInCanvas.bind("<Button-1>", self.zoomInMap)
+
+        zoomOut = ImageTk.PhotoImage(Image.open("img/zoomOut.jpg"))  # PIL solution
+        zoomOutCanvas = Canvas(self.MapFrame, width=30, height=30, bg='gray', bd=1, highlightthickness=0)
+        zoomOutCanvas.create_image(0, 0, anchor='nw', image=zoomOut)
+        zoomOutCanvas.image = zoomOut
+        zoomOutCanvas.place(x=450 - 32, y=380 - 32)
+        zoomOutCanvas.bind("<Button-1>", self.zoomOutMap)
+
+    def zoomOutMap(self, *args):
+        self.MapCanvas.delete("all")
+        if self.mapLevel < 15:
+            self.mapLevel += 1
+        mapImage = PhotoImage(file="maps/map" + str(self.mapLevel) + ".jpg")
+        self.MapCanvas.create_image(0, 0, anchor='nw', image=mapImage)
+        self.MapCanvas.image = mapImage
+
+    def zoomInMap(self, *args):
+        self.MapCanvas.delete("all")
+        if self.mapLevel > 1:
+            self.mapLevel -= 1
+        mapImage = PhotoImage(file="maps/map" + str(self.mapLevel) + ".jpg")
+        self.MapCanvas.create_image(0, 0, anchor='nw', image=mapImage)
+        self.MapCanvas.image = mapImage
+
+    def MouseWheelHandlerInMap(self,event):
+        def delta(event):
+            if event.num == 5 or event.delta < 0:
+                return -1
+            return 1
+        if delta(event) ==1:
+            self.zoomInMap()
+        else:
+            self.zoomOutMap()
+
+
+
 
 
 
