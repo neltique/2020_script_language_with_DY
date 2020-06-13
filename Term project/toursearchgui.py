@@ -138,7 +138,7 @@ class TourSearchGUI():
         self.chatbotImg = Image.open("img/chatbot.png")
         self.chatbotImg = self.chatbotImg.resize((60, 60), Image.ANTIALIAS)
         self.resizeChatbotImg = ImageTk.PhotoImage(self.chatbotImg)
-        self.chatbotTab = Button(self.window, width=60, height=60,bd = 0,highlightthickness = 0, bg="white",command = self.Chatbot)
+        self.chatbotTab = Button(self.window, width=60, height=60,bd = 0,highlightthickness = 0, bg="white")
         self.chatbotTab["image"] = self.resizeChatbotImg
         self.chatbotTab.place(x=830, y=430 - 62)
 
