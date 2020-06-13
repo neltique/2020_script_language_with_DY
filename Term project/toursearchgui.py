@@ -7,8 +7,6 @@ from tkinterhtml import *
 from tkinter import font
 from tkinter import messagebox
 
-import mail
-
 from urllib.request import urlopen
 from PIL import ImageTk, Image
 
@@ -104,10 +102,6 @@ class TourSearchGUI():
         self.InfoCanvasFrame.pack()
 
 
-
-
-
-
     # 버튼 설정
     def setupButton(self):
         # 검색 버튼
@@ -144,7 +138,7 @@ class TourSearchGUI():
         self.chatbotImg = Image.open("img/chatbot.png")
         self.chatbotImg = self.chatbotImg.resize((60, 60), Image.ANTIALIAS)
         self.resizeChatbotImg = ImageTk.PhotoImage(self.chatbotImg)
-        self.chatbotTab = Button(self.window, width=60, height=60,bd = 0,highlightthickness = 0, bg="white")
+        self.chatbotTab = Button(self.window, width=60, height=60,bd = 0,highlightthickness = 0, bg="white",command = self.Chatbot)
         self.chatbotTab["image"] = self.resizeChatbotImg
         self.chatbotTab.place(x=830, y=430 - 62)
 
@@ -294,6 +288,7 @@ class TourSearchGUI():
         s.quit()
 
         messagebox.showinfo("메일 보내기 완료","현재 선택한 관광지 정보를 \nhoney1586@naver.com로 송신을 완료했습니다.")
+
 
 
 TourSearchGUI()
