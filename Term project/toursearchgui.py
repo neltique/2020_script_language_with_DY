@@ -40,6 +40,8 @@ class TourSearchGUI():
         self.infoCount = 0
         self.mapLevel = 5
 
+        self.possiblemail = False
+
         ###############
         self.areaCodeDict = AreaCodeData        # json파일로 지역 dict를 받아온다
         self.AreaBasedList = AreaBasedList()    # api로 리스트 준비
@@ -87,6 +89,7 @@ class TourSearchGUI():
         self.infoDict = makeDetail(contentid)
         self.mapx = self.infoDict["mapx"]
         self.mapy = self.infoDict["mapy"]
+        self.possiblemail = True
 
     # 오른쪽 Frame 정보, 지도 그릴 Frame
     def setupInfoMapFrame(self):
@@ -270,7 +273,7 @@ class TourSearchGUI():
         else:
             self.zoomOutMap()
 
-    def Gmail(self):
+    def send_mail(self):
         s = smtplib.SMTP('smtp.gmail.com', 587)
         s.ehlo()
         s.starttls()
@@ -279,15 +282,33 @@ class TourSearchGUI():
         msg = MIMEMultipart()
         msg['Subject'] = "제목은 거둘뿐"
 
-        part = MIMEText(dictToHTML.dictToHTML(self.infoDict),'html')
+        part = MIMEText(dictToHTML.dictToHTML(self.infoDict), 'html')
         msg.attach(part)
 
-        s.sendmail("qorehduf3@gmail.com",'honey1586@naver.com',msg.as_string())
-
+        s.sendmail("qorehduf3@gmail.com", self.entry_formula_input.get(), msg.as_string())
 
         s.quit()
 
-        messagebox.showinfo("메일 보내기 완료","현재 선택한 관광지 정보를 \nhoney1586@naver.com로 송신을 완료했습니다.")
+        messagebox.showinfo("메일 보내기 완료", "현재 선택한 관광지 정보를 \n"+self.entry_formula_input.get()+"로 송신을 완료했습니다.")
+
+        self.widget.quit()
+
+    def Gmail(self):
+        if self.possiblemail == True:
+            self.widget = Tk()
+            self.widget.title("보낼 E-MAIL 입력")
+            self.widget.geometry("300x30")
+
+            self.entry_formula_input = Entry(self.widget,width=30,justify='left')
+            self.entry_formula_input.grid(row=0,column=0,padx=5)
+
+            self.inputmailvar = StringVar()
+
+            Button(self.widget,text="send",width=6,command=self.send_mail).grid(row=0,column=4,padx=5)
+
+            self.widget.mainloop()
+        else:
+            messagebox.showwarning("메일 보내기 실패!", "보낼 관광지 정보가 없습니다.\n메일을 보내려면 관광지를 선택해주시기 바랍니다.")
 
 
 
