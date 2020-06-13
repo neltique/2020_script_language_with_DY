@@ -291,20 +291,26 @@ class TourSearchGUI():
 
         messagebox.showinfo("메일 보내기 완료", "현재 선택한 관광지 정보를 \n"+self.entry_formula_input.get()+"로 송신을 완료했습니다.")
 
-        self.widget.quit()
+        self.widget.destroy()
+
 
     def Gmail(self):
         if self.possiblemail == True:
             self.widget = Tk()
             self.widget.title("보낼 E-MAIL 입력")
-            self.widget.geometry("300x30")
+            self.widget.geometry("300x100")
 
-            self.entry_formula_input = Entry(self.widget,width=30,justify='left')
-            self.entry_formula_input.grid(row=0,column=0,padx=5)
+
+            self.entry_formula_input = Entry(self.widget,width=40,justify='left')
+            self.entry_formula_input.place(x=10,y=5)
 
             self.inputmailvar = StringVar()
 
-            Button(self.widget,text="send",width=6,command=self.send_mail).grid(row=0,column=4,padx=5)
+            self.sendbuttonfont = font.Font(self.widget, size=10, weight='bold', family='Consolas')
+            sendbutton = Button(self.widget,text="send",width=30,height=3,font=self.sendbuttonfont,command=self.send_mail)
+
+
+            sendbutton.place(x=30,y=30)
 
             self.widget.mainloop()
         else:
