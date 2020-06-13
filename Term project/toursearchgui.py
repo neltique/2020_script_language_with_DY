@@ -1,12 +1,18 @@
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 from tkinter import *
 from tkinterhtml import *
 from tkinter import font
+from tkinter import messagebox
+
+import mail
 
 from urllib.request import urlopen
 from PIL import ImageTk, Image
 
 from tour import *
-from gmail import *
 
 import io
 import kakaoMap
@@ -130,7 +136,7 @@ class TourSearchGUI():
         self.mailImg = Image.open("img/mail.png")
         self.mailImg = self.mailImg.resize((60, 60), Image.ANTIALIAS)
         self.resizeMailImg = ImageTk.PhotoImage(self.mailImg)
-        self.mailTab = Button(self.window, width=60, height=60, bg="white",bd = 0,highlightthickness = 0, command=Gmail())
+        self.mailTab = Button(self.window, width=60, height=60, bg="white",bd = 0,highlightthickness = 0, command= self.Gmail)
         self.mailTab["image"] = self.resizeMailImg
         self.mailTab.place(x=830, y=262)
 
@@ -269,5 +275,25 @@ class TourSearchGUI():
             self.zoomInMap()
         else:
             self.zoomOutMap()
+
+    def Gmail(self):
+        s = smtplib.SMTP('smtp.gmail.com', 587)
+        s.ehlo()
+        s.starttls()
+        s.login('qorehduf3@gmail.com', 'jvljgoaecwgljjxe')
+
+        msg = MIMEMultipart()
+        msg['Subject'] = "제목은 거둘뿐"
+
+        part = MIMEText(dictToHTML.dictToHTML(self.infoDict),'html')
+        msg.attach(part)
+
+        s.sendmail("qorehduf3@gmail.com",'honey1586@naver.com',msg.as_string())
+
+
+        s.quit()
+
+        messagebox.showinfo("메일 보내기 완료","현재 선택한 관광지 정보를 \nhoney1586@naver.com로 송신을 완료했습니다.")
+
 
 TourSearchGUI()
