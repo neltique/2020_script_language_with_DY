@@ -1,10 +1,12 @@
 import urllib.request
-
 import http.client
 import xml.etree.ElementTree as ET
-
+import os
 
 def mapDownLoad(mapx, mapy):
+     if not os.path.isdir("maps"):
+          os.mkdir("maps")
+
      server = 'dapi.kakao.com'
      key = 'c11cd41a6b4ce614ae81b1b07cc954eb'  # 본인 카카오앱키 입력
      header = {'Authorization': 'KakaoAK '+key}
