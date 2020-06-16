@@ -2,6 +2,9 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+import chatbot as cb
+import webbrowser
+
 from tkinter import *
 from tkinterhtml import *
 from tkinter import font
@@ -141,7 +144,7 @@ class TourSearchGUI():
         self.chatbotImg = Image.open("img/chatbot.png")
         self.chatbotImg = self.chatbotImg.resize((60, 60), Image.ANTIALIAS)
         self.resizeChatbotImg = ImageTk.PhotoImage(self.chatbotImg)
-        self.chatbotTab = Button(self.window, width=60, height=60,bd = 0,highlightthickness = 0, bg="white")
+        self.chatbotTab = Button(self.window, width=60, height=60,bd = 0,highlightthickness = 0, bg="white",command=self.pressedChatbot)
         self.chatbotTab["image"] = self.resizeChatbotImg
         self.chatbotTab.place(x=830, y=430 - 62)
 
@@ -280,7 +283,7 @@ class TourSearchGUI():
         s.login('qorehduf3@gmail.com', 'jvljgoaecwgljjxe')
 
         msg = MIMEMultipart()
-        msg['Subject'] = "제목은 거둘뿐"
+        msg['Subject'] = "요청하신 관광지 정보입니다."
 
         part = MIMEText(dictToHTML.dictToHTML(self.infoDict), 'html')
         msg.attach(part)
@@ -315,6 +318,13 @@ class TourSearchGUI():
             self.widget.mainloop()
         else:
             messagebox.showwarning("메일 보내기 실패!", "보낼 관광지 정보가 없습니다.\n메일을 보내려면 관광지를 선택해주시기 바랍니다.")
+
+    def pressedChatbot(self):
+        webbrowser.open_new('https://web.telegram.org/#/im?p=@BDY_test_bot')
+
+
+
+
 
 
 

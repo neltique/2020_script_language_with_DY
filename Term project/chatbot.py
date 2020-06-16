@@ -1,50 +1,75 @@
-from telegram.ext import *
+# -*- coding: euc-kr -*-
+
+#BDY_test_bot
+#931618982:AAEQYTASmXoK9HItKMJSnaCiHC7XeuJbWHs
+#1220588565 ³» ¾ÆÀÌµğ
+#api ÅäÅ« SpWe9UpmMXVZh8MHhnRCpSeVMBO88OXs%2F%2FHIVBSWA3GLBFMhbV9i0WbynUMZ6G66WEUgerpPxoXEVU5DYrQRTg%3D%3D
+
 from bs4 import BeautifulSoup
+from urllib import parse
+from collections import OrderedDict #Áßº¹ Á¦°Å
 import requests
+import os
+import telegram
 
-def show_music_rank(self, update):
-    header = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko'}
-    addr = 'https://www.melon.com/chart/index.html'
-    self.addr = addr
-    melon = requests.get(self.addr, headers=header)
-    soup = BeautifulSoup(melon.text, 'html.parser')
+def Site_ON():
+    search = parse.urlparse('https://www.boannews.com/search/news_list.asp?search=title&find=Ãë¾àÁ¡')
+    query = parse.parse_qs(search.query) #º¸¾È´º½º ÀÎÄÚµù °ªÀÌ euc-kr
+    S_query = parse.urlencode(query, encoding='euc-kr', doseq=True) # URL ÀÎÄÚµù
+    url = "https://www.boannews.com/search/news_list.asp?{}".format(S_query)
+    Article_Crawll(url)
 
-    titles = soup.select('#lst50 > td > div > div > div.ellipsis.rank01 > span > a')
-    artist = soup.select('#lst50 > td > div > div > div.ellipsis.rank02 > span')
-    update.message.reply_text('ì‹¤ì‹œê°„ ë©œë¡  ì°¨íŠ¸\n' + '1ìœ„: ' + titles[1].text + ' - ' + artist[1].text + '\n')
+def Article_Crawll(url):
+    news_link = []
+    response = requests.get(url)
+    html = response.text
+    soup = BeautifulSoup(html, 'html.parser')
+    for link in soup.find_all('a', href=True):
+        notices_link = link['href']
+        if '/media/view.asp?idx=' in notices_link:
+            news_link.append(notices_link) #news_link¿¡ ¸®½ºÆ® Ãß°¡
 
-import logging
+    news_link = list(OrderedDict.fromkeys(news_link)) #Áßº¹Á¦°Å
+    Compare(news_link)
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level = logging.INFO)
-logger = logging.getLogger(__name__)
+def Compare(news_link):
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    temp = []
+    cnt = 0
+    with open(os.path.join(BASE_DIR, 'compare.txt'), 'r')as f_read:
+        before = f_read.readlines()
+        before = [line.rstrip() for line in before] #(\n)strip in list
 
-def start(bot,update):
-    bot.send_message(chat_id=update.message.chat_id,text="ë´‡ ì‘ë™í•©ë‹ˆë‹¤.")
+        f_read.close()
+        for i in news_link:
+            if i not in before:
+                temp.append(i)
+                cnt = cnt + 1
+                with open(os.path.join(BASE_DIR, 'compare.txt'), 'a') as f_write:
+                    f_write.write(i+'\n')
+                    f_write.close()
+        if cnt > 0: #cnt°¡ 1ÀÌ¶óµµ Áõ°¡ÇÏ¸é »õ·Î¿î ±â»ç°¡ ÀÖ´Ù´Â ¶æ
+            Maintext_Crawll(temp, cnt)
 
-def unknown(bot,update):
-    bot.send_message(chat_id=update.message.chat_id,text="ì£„ì†¡í•˜ì§€ë§Œ ê·¸ ëª…ë ¹ì–´ë¥¼ ì´í•´í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.")
+def Maintext_Crawll(temp, cnt):
+    bot = telegram.Bot(token='931618982:AAEQYTASmXoK9HItKMJSnaCiHC7XeuJbWHs')
+    chat_id = bot.getUpdates()[-1].message.chat.id
+    NEW = "[+] º¸¾È´º½º ' Ãë¾àÁ¡ '¿¡ »õ·Î¿î ´º½º´Â {}°³ ÀÔ´Ï´Ù.".format(cnt)
+    bot.sendMessage(chat_id=chat_id, text=NEW)
+    for n in temp:
+        Main_URL = "https://www.boannews.com{}".format (n.strip())
+        bot.sendMessage(chat_id=chat_id, text=Main_URL)
 
-def main():
-    updater = Updater('931618982:AAEQYTASmXoK9HItKMJSnaCiHC7XeuJbWHs')
-    dp = updater.dispatcher
-    print("Bot started")
+        response = requests.get(Main_URL)
+        html = response.text
+        soup = BeautifulSoup(html, 'html.parser')
+        title = soup.find_all("div",{"id":"news_title02"})
+        contents = soup.find_all("div",{"id":"news_content"})
+        date = soup.find_all("div",{"id":"news_util01"})
+        photos = soup.find_all("div",{"class":"news_image"})
+        for n in contents:
+            text = n.text.strip()
 
-    updater.start_polling()
-    dp.add_handler(CommandHandler('start',start))
-
-    dp.add_handler(MessageHandler(Filters.command,unknown))
-
-    updater.idle()
-
-
-
-    dp.add_handler(CommandHandler('ìµœì‹ ìŒì•…', show_music_rank))
-
-    updater.stop()
-if __name__ == '__main__':
-    main()
-
-
-
+if __name__ == "__main__":
+    Site_ON()
 
