@@ -1,75 +1,110 @@
-# -*- coding: euc-kr -*-
-
+#-*- coding:utf-8 -*-
 #BDY_test_bot
 #931618982:AAEQYTASmXoK9HItKMJSnaCiHC7XeuJbWHs
-#1220588565 ³» ¾ÆÀÌµğ
-#api ÅäÅ« SpWe9UpmMXVZh8MHhnRCpSeVMBO88OXs%2F%2FHIVBSWA3GLBFMhbV9i0WbynUMZ6G66WEUgerpPxoXEVU5DYrQRTg%3D%3D
+#1220588565 ë‚´ ì•„ì´ë””
 
+#api í† í° SpWe9UpmMXVZh8MHhnRCpSeVMBO88OXs%2F%2FHIVBSWA3GLBFMhbV9i0WbynUMZ6G66WEUgerpPxoXEVU5DYrQRTg%3D%3D
+from selenium import webdriver
+import time
+from selenium import webdriver
 from bs4 import BeautifulSoup
-from urllib import parse
-from collections import OrderedDict #Áßº¹ Á¦°Å
-import requests
-import os
-import telegram
+from pymongo import MongoClient
 
-def Site_ON():
-    search = parse.urlparse('https://www.boannews.com/search/news_list.asp?search=title&find=Ãë¾àÁ¡')
-    query = parse.parse_qs(search.query) #º¸¾È´º½º ÀÎÄÚµù °ªÀÌ euc-kr
-    S_query = parse.urlencode(query, encoding='euc-kr', doseq=True) # URL ÀÎÄÚµù
-    url = "https://www.boannews.com/search/news_list.asp?{}".format(S_query)
-    Article_Crawll(url)
+import telepot
+from telepot.loop import MessageLoop
+import time
+def chatbot():
+    options = webdriver.ChromeOptions()
 
-def Article_Crawll(url):
-    news_link = []
-    response = requests.get(url)
-    html = response.text
-    soup = BeautifulSoup(html, 'html.parser')
-    for link in soup.find_all('a', href=True):
-        notices_link = link['href']
-        if '/media/view.asp?idx=' in notices_link:
-            news_link.append(notices_link) #news_link¿¡ ¸®½ºÆ® Ãß°¡
+    # headless ì˜µì…˜ ì„¤ì •
+    options.add_argument('headless')
+    options.add_argument("no-sandbox")
 
-    news_link = list(OrderedDict.fromkeys(news_link)) #Áßº¹Á¦°Å
-    Compare(news_link)
+    # ë¸Œë¼ìš°ì € ìœˆë„ìš° ì‚¬ì´ì¦ˆ
+    options.add_argument('window-size=1920x1080')
 
-def Compare(news_link):
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    temp = []
-    cnt = 0
-    with open(os.path.join(BASE_DIR, 'compare.txt'), 'r')as f_read:
-        before = f_read.readlines()
-        before = [line.rstrip() for line in before] #(\n)strip in list
+    # ì‚¬ëŒì²˜ëŸ¼ ë³´ì´ê²Œ í•˜ëŠ” ì˜µì…˜ë“¤
+    options.add_argument("disable-gpu")  # ê°€ì† ì‚¬ìš© x
+    options.add_argument("lang=ko_KR")  # ê°€ì§œ í”ŒëŸ¬ê·¸ì¸ íƒ‘ì¬
+    options.add_argument(
+        'user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')  # user-agent ì´ë¦„ ì„¤ì •
 
-        f_read.close()
-        for i in news_link:
-            if i not in before:
-                temp.append(i)
-                cnt = cnt + 1
-                with open(os.path.join(BASE_DIR, 'compare.txt'), 'a') as f_write:
-                    f_write.write(i+'\n')
-                    f_write.close()
-        if cnt > 0: #cnt°¡ 1ÀÌ¶óµµ Áõ°¡ÇÏ¸é »õ·Î¿î ±â»ç°¡ ÀÖ´Ù´Â ¶æ
-            Maintext_Crawll(temp, cnt)
+    client = MongoClient('localhost', 27017)
+    db = client.dbproject
 
-def Maintext_Crawll(temp, cnt):
-    bot = telegram.Bot(token='931618982:AAEQYTASmXoK9HItKMJSnaCiHC7XeuJbWHs')
-    chat_id = bot.getUpdates()[-1].message.chat.id
-    NEW = "[+] º¸¾È´º½º ' Ãë¾àÁ¡ '¿¡ »õ·Î¿î ´º½º´Â {}°³ ÀÔ´Ï´Ù.".format(cnt)
-    bot.sendMessage(chat_id=chat_id, text=NEW)
-    for n in temp:
-        Main_URL = "https://www.boannews.com{}".format (n.strip())
-        bot.sendMessage(chat_id=chat_id, text=Main_URL)
+    TOKEN_MAIN = '931618982:AAEQYTASmXoK9HItKMJSnaCiHC7XeuJbWHs'  # ìœ„ì—ì„œ ë°œê¸‰ë°›ì€ í† í° ê¸°ì…
+    searchList = []
+    imgUrl = []
 
-        response = requests.get(Main_URL)
-        html = response.text
-        soup = BeautifulSoup(html, 'html.parser')
-        title = soup.find_all("div",{"id":"news_title02"})
-        contents = soup.find_all("div",{"id":"news_content"})
-        date = soup.find_all("div",{"id":"news_util01"})
-        photos = soup.find_all("div",{"class":"news_image"})
-        for n in contents:
-            text = n.text.strip()
+    def searchInChatbot(text):
+        global searchList
+        global imgUrl
+        imgUrl.clear()
+        searchList.clear()
 
-if __name__ == "__main__":
-    Site_ON()
+        # ë“œë¼ì´ë²„ ìœ„ì¹˜ ê²½ë¡œ ì…ë ¥
+
+        driver = webdriver.Chrome('chromedriver.exe', chrome_options=options)
+        driver.get('https://korean.visitkorea.or.kr/search/search_list.do?keyword=' + text + '&temp=')
+        driver.implicitly_wait(3)  # ì•”ë¬µì ìœ¼ë¡œ ì›¹ ìì›ì„ (ìµœëŒ€) 3ì´ˆ ê¸°ë‹¤ë¦¬ê¸°
+
+        driver.find_element_by_xpath('//*[@id="tabView4"]/a').click()  # ì—¬í–‰ì§€ í´ë¦­
+        # driver.find_element_by_xpath('//*[@id="3"]').click()  # ì¸ê¸°ìˆœ í´ë¦­
+        time.sleep(1)
+
+        soup = BeautifulSoup(driver.page_source, 'html.parser')  # BeautifulSoupì‚¬ìš©í•˜ê¸°
+
+        li_index = 1
+
+        spots = soup.select('#contents > div > div.box_leftType1 > ul > li >div.area_txt ')
+        imgUrl = soup.find_all("img")
+
+        for spot in spots:
+            # name = spot.select_one('div > a').text()
+
+            name_key = '//*[@id="contents"]/div/div[1]/ul/li[{index}]/div[2]/div/a'.format(index=li_index)
+            address_key = '//*[@id="contents"]/div/div[1]/ul/li[{index}]/div[2]/p'.format(index=li_index)
+
+            name = driver.find_element_by_xpath(name_key).text
+            address = driver.find_element_by_xpath(address_key).text
+            searchList.append({"name": name, "address": address})
+
+            print("name", name, "address", address, "image", imgUrl)
+
+            li_index = li_index + 1
+
+        driver.close()
+
+    def handle_main(msg):
+        global searchList
+        global imgUrl
+        msg_type, chat_type, chat_id, msg_data, msg_id = telepot.glance(msg, long=True)
+
+        print(msg)
+        okheebot.sendMessage(chat_id, "ê²€ìƒ‰í•˜ì‹  ì§€ëª…ì„ ê²€ìƒ‰ì¤‘ì…ë‹ˆë‹¤...")
+        if msg_type == 'text':
+            if msg['text'][0] == '!':
+                searchString = msg['text'][1:]
+                searchInChatbot(searchString)
+
+                count = 0
+                for list in searchList:
+                    if imgUrl[count]['src'] != 'https://cdn.visitkorea.or.kr/img/call?cmd=VIEW&id=':
+                        okheebot.sendPhoto(chat_id, imgUrl[count]['src'])
+
+                    script = "\nëª…ì¹­ : " + list['name'] + "\n"
+                    script += "ìœ„ì¹˜ : " + list['address'] + "\n\n"
+
+                    okheebot.sendMessage(chat_id, script)
+                    count += 1
+
+        okheebot.sendMessage(chat_id, "ê²€ìƒ‰í•˜ì‹  ë‚´ìš©ì´ ë§ˆìŒì— ë“œì‹œë‚˜ìš”?")
+
+    okheebot = telepot.Bot(TOKEN_MAIN)
+    MessageLoop(okheebot, handle_main).run_as_thread()
+
+    while True:
+        time.sleep(10)
+
+
 

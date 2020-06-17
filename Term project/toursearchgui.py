@@ -2,8 +2,9 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-import chatbot as cb
+import chatbot
 import webbrowser
+
 
 from tkinter import *
 from tkinterhtml import *
@@ -19,6 +20,8 @@ import io
 import kakaoMap
 import json
 import dictToHTML
+
+import spam
 
 with open('AreaCodes.json', 'r', encoding='UTF-8-sig') as f:
      AreaCodeData = json.load(f)
@@ -39,7 +42,7 @@ class TourSearchGUI():
         self.window.resizable(width=False, height=False)
         self.window.configure(bg="skyblue")
         self.fontstyle = font.Font(self.window, size=8, weight='bold', family='Consolas')
-
+        self.timeFontStyle = font.Font(self.window, size=22, weight='bold', family='Consolas')
         self.infoCount = 0
         self.mapLevel = 5
 
@@ -55,7 +58,7 @@ class TourSearchGUI():
 
 
         self.setupInfoMapFrame()
-
+        self.spam()
         ########################################################################################################################
         self.window.option_add('*TCombobox*Listbox.font', self.combofont)
         self.window.mainloop()
@@ -321,11 +324,11 @@ class TourSearchGUI():
 
     def pressedChatbot(self):
         webbrowser.open_new('https://web.telegram.org/#/im?p=@BDY_test_bot')
+        chatbot.chatbot()
 
-
-
-
-
-
+    def spam(self):
+        a = spam.strlen('dd')
+        time = Label(self.window, width = 10,font = self.timeFontStyle, text = str(a[0])+"시 "+str(a[1])+"분", fg = "black", bg="skyblue" )
+        time.place(x=650,y=10)
 
 TourSearchGUI()
