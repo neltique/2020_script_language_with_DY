@@ -42,7 +42,7 @@ class TourSearchGUI():
         self.window.resizable(width=False, height=False)
         self.window.configure(bg="skyblue")
         self.fontstyle = font.Font(self.window, size=8, weight='bold', family='Consolas')
-        self.timeFontStyle = font.Font(self.window, size=22, weight='bold', family='Consolas')
+        self.timeFontStyle = font.Font(self.window, size=16, weight='bold', family='Consolas')
         self.infoCount = 0
         self.mapLevel = 5
 
@@ -328,7 +328,7 @@ class TourSearchGUI():
 
     def spam(self):
         a = spam.strlen('dd')
-        time = Label(self.window, width = 10,font = self.timeFontStyle, text = str(a[0])+"시 "+str(a[1])+"분", fg = "black", bg="skyblue" )
-        time.place(x=650,y=10)
+        time = Label(self.window, width = 30,font = self.timeFontStyle, text = "프로그램 시작 시간 - "+str(a[0])+"시 "+str(a[1])+"분", fg = "black", bg="skyblue" )
+        time.place(x=550,y=10)
 
 TourSearchGUI()
