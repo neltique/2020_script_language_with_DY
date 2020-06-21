@@ -5,8 +5,6 @@
 
 #api 토큰 SpWe9UpmMXVZh8MHhnRCpSeVMBO88OXs%2F%2FHIVBSWA3GLBFMhbV9i0WbynUMZ6G66WEUgerpPxoXEVU5DYrQRTg%3D%3D
 from selenium import webdriver
-import time
-from selenium import webdriver
 from bs4 import BeautifulSoup
 from pymongo import MongoClient
 

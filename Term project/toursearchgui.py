@@ -1,27 +1,24 @@
-import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-
-import chatbot
-import webbrowser
-
 
 from tkinter import *
 from tkinterhtml import *
 from tkinter import font
 from tkinter import messagebox
-
 from urllib.request import urlopen
 from PIL import ImageTk, Image
 
-from tour import *
+from tourData import *
 
+import smtplib
+import webbrowser
 import io
-import kakaoMap
 import json
-import dictToHTML
-
 import spam
+
+import dictToHTML
+import kakaoMap
+import chatbot
 
 with open('AreaCodes.json', 'r', encoding='UTF-8-sig') as f:
      AreaCodeData = json.load(f)
@@ -84,7 +81,7 @@ class TourSearchGUI():
         self.infoCount = 0
         self.makeInfoDetailDict()
         self.makeInfoFrame()
-        kakaoMap.mapDownLoad(self.mapx,self.mapy)
+        kakaoMap.mapDownLoad(self.mapx, self.mapy)
         self.mapLevel = 5
         self.makeMapFrame()
 
@@ -240,7 +237,7 @@ class TourSearchGUI():
         self.MapCanvas.bind("<MouseWheel>", self.MouseWheelHandlerInMap)
 
         zoomInCanvas = Canvas(self.MapFrame, width=30, height=30, bg='gray', bd=1, highlightthickness=0)
-        zoomIn = ImageTk.PhotoImage(Image.open("img/zoomin.jpg"))  # PIL solution
+        zoomIn = ImageTk.PhotoImage(Image.open("img/zoomIn.jpg"))  # PIL solution
         zoomInCanvas.create_image(0, 0, anchor='nw', image=zoomIn)
         zoomInCanvas.image = zoomIn
         zoomInCanvas.place(x=450 - 32, y=380 - 64)
@@ -331,4 +328,5 @@ class TourSearchGUI():
         time = Label(self.window, width = 30,font = self.timeFontStyle, text = "프로그램 시작 시간 - "+str(a[0])+"시 "+str(a[1])+"분", fg = "black", bg="skyblue" )
         time.place(x=550,y=10)
 
-TourSearchGUI()
+if __name__ == "__main__":
+    TourSearchGUI()
