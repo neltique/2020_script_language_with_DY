@@ -1,10 +1,9 @@
-from distutils.core import setup
+from distutils.core import setup,Extension
 
 setup(
       name='serachTour',
       version='1.0',
       author='DY&EK',
-      author_email='neltique123@gmail.com',
       url = "https://github.com/neltique/2020_script_language_with_DY",
       description='Tkinter search Tour Project by DY&Ek',
       python_requires='>=3',
@@ -16,7 +15,10 @@ setup(
       'Pillow==7.1.2',
       'requests==2.23.0',
       'tkinterhtml==0.7'],
-      py_modules = ['chatbot','kakaoMap','tourData','toursearchgui','dictToHTML']
+      packages=['toursearch'],
+      zip_safe=True,
+      data_files=[('Lib/site-packages/toursearch', ['toursearch/AreaCodes.json','toursearch/chromedriver.exe'])],
+      include_package_data=True,
 
 )
 

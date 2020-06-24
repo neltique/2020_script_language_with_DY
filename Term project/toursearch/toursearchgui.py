@@ -8,7 +8,7 @@ from tkinter import messagebox
 from urllib.request import urlopen
 from PIL import ImageTk, Image
 
-from tourData import *
+from toursearch.tourData import *
 
 import smtplib
 import webbrowser
@@ -16,9 +16,7 @@ import io
 import json
 import spam
 
-import dictToHTML
-import kakaoMap
-import chatbot
+from toursearch import chatbot, kakaoMap, dictToHTML
 
 with open('AreaCodes.json', 'r', encoding='UTF-8-sig') as f:
      AreaCodeData = json.load(f)
@@ -117,7 +115,7 @@ class TourSearchGUI():
         self.searchButton.place(x=430, y=10)
 
         # 정보 버튼
-        self.infoImg = Image.open("img/info.png")
+        self.infoImg = Image.open("../img/info.png")
         self.infoImg = self.infoImg.resize((60, 60), Image.ANTIALIAS)
         self.resizeInfoImg = ImageTk.PhotoImage(self.infoImg)
         self.infoTab = Button(self.window, width=60, height=60, bg="white",bd = 0,highlightthickness = 0, command=lambda:gantihal(self.InfoFrame))
@@ -125,7 +123,7 @@ class TourSearchGUI():
         self.infoTab.place(x=830, y=50)
 
         # 지도 버튼
-        self.mapImg = Image.open("img/map.png")
+        self.mapImg = Image.open("../img/map.png")
         self.mapImg = self.mapImg.resize((60, 60), Image.ANTIALIAS)
         self.resizeMapImg = ImageTk.PhotoImage(self.mapImg)
         self.mapTab = Button(self.window, width=60, height=60, bg="white",bd = 0,highlightthickness = 0, command=lambda:gantihal(self.MapFrame))
@@ -133,7 +131,7 @@ class TourSearchGUI():
         self.mapTab.place(x=830, y=156)
 
         # 메일 보내기 버튼
-        self.mailImg = Image.open("img/mail.png")
+        self.mailImg = Image.open("../img/mail.png")
         self.mailImg = self.mailImg.resize((60, 60), Image.ANTIALIAS)
         self.resizeMailImg = ImageTk.PhotoImage(self.mailImg)
         self.mailTab = Button(self.window, width=60, height=60, bg="white",bd = 0,highlightthickness = 0, command= self.Gmail)
@@ -141,7 +139,7 @@ class TourSearchGUI():
         self.mailTab.place(x=830, y=262)
 
         # 챗봇 버튼튼
-        self.chatbotImg = Image.open("img/chatbot.png")
+        self.chatbotImg = Image.open("../img/chatbot.png")
         self.chatbotImg = self.chatbotImg.resize((60, 60), Image.ANTIALIAS)
         self.resizeChatbotImg = ImageTk.PhotoImage(self.chatbotImg)
         self.chatbotTab = Button(self.window, width=60, height=60,bd = 0,highlightthickness = 0, bg="white",command=self.pressedChatbot)
@@ -237,13 +235,13 @@ class TourSearchGUI():
         self.MapCanvas.bind("<MouseWheel>", self.MouseWheelHandlerInMap)
 
         zoomInCanvas = Canvas(self.MapFrame, width=30, height=30, bg='gray', bd=1, highlightthickness=0)
-        zoomIn = ImageTk.PhotoImage(Image.open("img/zoomIn.jpg"))  # PIL solution
+        zoomIn = ImageTk.PhotoImage(Image.open("../img/zoomIn.jpg"))  # PIL solution
         zoomInCanvas.create_image(0, 0, anchor='nw', image=zoomIn)
         zoomInCanvas.image = zoomIn
         zoomInCanvas.place(x=450 - 32, y=380 - 64)
         zoomInCanvas.bind("<Button-1>", self.zoomInMap)
 
-        zoomOut = ImageTk.PhotoImage(Image.open("img/zoomOut.jpg"))  # PIL solution
+        zoomOut = ImageTk.PhotoImage(Image.open("../img/zoomOut.jpg"))  # PIL solution
         zoomOutCanvas = Canvas(self.MapFrame, width=30, height=30, bg='gray', bd=1, highlightthickness=0)
         zoomOutCanvas.create_image(0, 0, anchor='nw', image=zoomOut)
         zoomOutCanvas.image = zoomOut
@@ -328,5 +326,18 @@ class TourSearchGUI():
         time = Label(self.window, width = 30,font = self.timeFontStyle, text = "프로그램 시작 시간 - "+str(a[0])+"시 "+str(a[1])+"분", fg = "black", bg="skyblue" )
         time.place(x=550,y=10)
 
-if __name__ == "__main__":
-    TourSearchGUI()
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+TourSearchGUI()

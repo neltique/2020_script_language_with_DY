@@ -11,6 +11,10 @@ from pymongo import MongoClient
 import telepot
 from telepot.loop import MessageLoop
 import time
+
+imgUrl = []
+searchList = []
+
 def chatbot():
     options = webdriver.ChromeOptions()
 
@@ -27,18 +31,15 @@ def chatbot():
     options.add_argument(
         'user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')  # user-agent 이름 설정
 
-    client = MongoClient('localhost', 27017)
-    db = client.dbproject
-
     TOKEN_MAIN = '931618982:AAEQYTASmXoK9HItKMJSnaCiHC7XeuJbWHs'  # 위에서 발급받은 토큰 기입
-    searchList = []
-    imgUrl = []
 
     def searchInChatbot(text):
         global searchList
         global imgUrl
-        imgUrl.clear()
-        searchList.clear()
+        if imgUrl != None:
+            imgUrl.clear()
+        if searchList != None:
+            searchList.clear()
 
         # 드라이버 위치 경로 입력
 
@@ -100,9 +101,5 @@ def chatbot():
 
     okheebot = telepot.Bot(TOKEN_MAIN)
     MessageLoop(okheebot, handle_main).run_as_thread()
-
-    while True:
-        time.sleep(10)
-
 
 
